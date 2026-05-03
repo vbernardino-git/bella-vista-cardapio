@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bella Vista — Painel da Cozinha</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- Supabase SDK removido: usando fetch puro para evitar DataCloneError no Safari/iOS -->
+<style>
+  :root {
+    --bg: #0F1117;
+    --surface: #1A1D27;
+    --surface2: #22263A;
+    --border: #2E3347;
+    --text: #E8EAF0;
+    --muted: #6B7280;
+    --gold: #F59E0B;
+    --green: #10B981;
+    --red: #EF4444;
+    --blue: #3B82F6;
+    --purple: #8B5CF6;
+    --orange: #F97316;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* TOPBAR */
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0.85rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .kitchen-badge {
+    background: var(--orange);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.75rem;
+    border-radius: 6px;
+  }
+
+  .topbar h1 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--green);
+    display: inline-block;
+    animation: pulse 1.5s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(0.85); }
+  }
+
+  .status-dot.offline { background: var(--red); animation: none; }
+
+  .live-text {
+    font-size: 0.8rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .clock {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.95rem;
+    color: var(--gold);
+    letter-spacing: 0.05em;
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .stat-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.75rem 1.25rem;
+    min-width: 120px;
+    flex-shrink: 0;
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.25rem;
+  }
+
+  .stat-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.6rem;
+    font-weight: 700;
+  }
+
+  .stat-value.orange { color: var(--orange); }
+  .stat-value.green { color: var(--green); }
+  .stat-value.gold { color: var(--gold); }
+  .stat-value.blue { color: var(--blue); }
+
+  /* COLUMNS */
+  .board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    flex: 1;
+    background: var(--border);
+    overflow: hidden;
+  }
+
+  .column {
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .col-header {
+    padding: 1rem 1.25rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface);
+  }
+
+  .col-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .col-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 100px;
+    font-weight: 700;
+  }
+
+  .col-badge.orange { background: rgba(249,115,22,0.15); color: var(--orange); }
+  .col-badge.blue { background: rgba(59,130,246,0.15); color: var(--blue); }
+  .col-badge.green { background: rgba(16,185,129,0.15); color: var(--green); }
+
+  .col-orders {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  /* ORDER CARDS */
+  .order-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    animation: slideIn 0.35s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .order-card:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+
+  .order-card.pending { border-top: 3px solid var(--orange); }
+  .order-card.preparing { border-top: 3px solid var(--blue); }
+  .order-card.done { border-top: 3px solid var(--green); opacity: 0.85; }
+
+  .card-header {
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .order-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--gold);
+  }
+
+  .order-client {
+    font-weight: 600;
+    font-size: 0.9rem;
+    flex: 1;
+    margin-left: 0.75rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .order-table {
+    font-size: 0.75rem;
+    color: var(--muted);
+    background: var(--surface2);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  .card-body {
+    padding: 0.75rem 1rem;
+  }
+
+  .order-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.3rem 0;
+    font-size: 0.88rem;
+    border-bottom: 1px dashed var(--border);
+  }
+
+  .order-item:last-of-type { border-bottom: none; }
+
+  .item-qty {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    color: var(--gold);
+    margin-right: 0.5rem;
+  }
+
+  .obs-chip {
+    background: rgba(249,115,22,0.12);
+    border: 1px solid rgba(249,115,22,0.3);
+    color: var(--orange);
+    font-size: 0.75rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.35rem;
+  }
+
+  .card-footer {
+    padding: 0.6rem 1rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .timer {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .timer.urgent { color: var(--red); }
+  .timer.warning { color: var(--orange); }
+
+  .action-btn {
+    flex: 1;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+
+  .action-btn:active { transform: scale(0.97); }
+  .action-btn:hover { opacity: 0.85; }
+
+  .btn-start { background: var(--blue); color: white; }
+  .btn-done { background: var(--green); color: white; }
+  .btn-archive { background: var(--surface2); color: var(--muted); }
+
+  /* EMPTY STATE */
+  .empty-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    color: var(--muted);
+    font-size: 0.85rem;
+    gap: 0.5rem;
+    flex: 1;
+  }
+
+  .empty-col .icon { font-size: 2.5rem; opacity: 0.4; }
+
+  /* NEW ORDER ALERT */
+  .alert-bar {
+    display: none;
+    background: var(--orange);
+    color: white;
+    text-align: center;
+    padding: 0.6rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    animation: blink 1s step-end infinite;
+    cursor: pointer;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  .alert-bar.show { display: block; }
+
+  /* SUPABASE CONFIG PANEL */
+  .config-panel {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  .config-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 480px;
+    width: 100%;
+  }
+
+  .config-box h2 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: var(--gold);
+  }
+
+  .config-box p { color: var(--muted); font-size: 0.85rem; margin-bottom: 1.5rem; line-height: 1.5; }
+
+  .config-box input {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    margin-bottom: 0.75rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .config-box input:focus { border-color: var(--gold); }
+
+  .config-box label { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.25rem; display: block; }
+
+  .config-save {
+    width: 100%;
+    background: var(--gold);
+    color: var(--bg);
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 0.5rem;
+  }
+
+  .demo-btn {
+    width: 100%;
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.6rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    cursor: pointer;
+    margin-top: 0.5rem;
+  }
+
+  @media (max-width: 700px) {
+    .board { grid-template-columns: 1fr; }
+    .column { max-height: 60vh; }
+  }
+</style>
+</head>
+<body>
+
+<!-- CONFIG MODAL -->
+<div class="config-panel" id="configPanel">
+  <div class="config-box">
+    <h2>⚙️ Configuração do Painel</h2>
+    <p>Cole aqui as credenciais do seu projeto Supabase. Estas ficam salvas localmente no dispositivo da cozinha.</p>
+    <label>URL do Projeto Supabase</label>
+    <input id="cfgUrl" type="url" placeholder="https://xxxxxxxxxxx.supabase.co">
+    <label>Chave Anon (pública)</label>
+    <input id="cfgKey" type="text" placeholder="eyJhbGciO...">
+    <button class="config-save" onclick="saveConfig()">✓ Conectar e Entrar</button>
+    <button class="demo-btn" onclick="demoMode()">▶ Entrar em modo demo (sem banco de dados)</button>
+  </div>
+</div>
+
+<!-- ALERT BAR -->
+<div class="alert-bar" id="alertBar" onclick="dismissAlert()">
+  🔔 NOVO PEDIDO CHEGOU — clique para dispensar
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="kitchen-badge">🍳 Cozinha</span>
+    <h1>Bella Vista — Painel</h1>
+  </div>
+  <div class="topbar-right">
+    <div class="live-text">
+      <span class="status-dot" id="statusDot"></span>
+      <span id="statusText">Conectando...</span>
+    </div>
+    <div class="clock" id="clock"></div>
+  </div>
+</div>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat-card">
+    <div class="stat-label">Aguardando</div>
+    <div class="stat-value orange" id="statPending">0</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Preparando</div>
+    <div class="stat-value blue" id="statPreparing">0</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Prontos hoje</div>
+    <div class="stat-value green" id="statDone">0</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Total hoje</div>
+    <div class="stat-value gold" id="statRevenue">R$ 0</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Pedidos hoje</div>
+    <div class="stat-value blue" id="statTotal">0</div>
+  </div>
+</div>
+
+<!-- KANBAN BOARD -->
+<div class="board">
+  <!-- PENDENTES -->
+  <div class="column">
+    <div class="col-header">
+      <div class="col-title">
+        🔴 Aguardando
+        <span class="col-badge orange" id="badge-pending">0</span>
+      </div>
+    </div>
+    <div class="col-orders" id="col-pending">
+      <div class="empty-col"><div class="icon">✅</div><p>Nenhum pedido pendente</p></div>
+    </div>
+  </div>
+
+  <!-- PREPARANDO -->
+  <div class="column">
+    <div class="col-header">
+      <div class="col-title">
+        🔵 Preparando
+        <span class="col-badge blue" id="badge-preparing">0</span>
+      </div>
+    </div>
+    <div class="col-orders" id="col-preparing">
+      <div class="empty-col"><div class="icon">👨‍🍳</div><p>Nenhum em preparo</p></div>
+    </div>
+  </div>
+
+  <!-- PRONTOS -->
+  <div class="column">
+    <div class="col-header">
+      <div class="col-title">
+        🟢 Prontos
+        <span class="col-badge green" id="badge-done">0</span>
+      </div>
+    </div>
+    <div class="col-orders" id="col-done">
+      <div class="empty-col"><div class="icon">🍽️</div><p>Nenhum pronto ainda</p></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// STATE
+// ============================================================
+let supabaseClient = null;
+let orders = {};
+let demoInterval = null;
+let isDemoMode = false;
+
+// ============================================================
+// CONFIG
+// ============================================================
+async function saveConfig() {
+  const url = document.getElementById('cfgUrl').value.trim();
+  const key = document.getElementById('cfgKey').value.trim();
+
+  if (!url || !key) { alert('Preencha os dois campos!'); return; }
+
+  const btn = document.querySelector('.config-save');
+  btn.textContent = 'Conectando...';
+  btn.disabled = true;
+
+  const ok = await initSupabase(url, key);
+
+  if (ok) {
+    localStorage.setItem('sb_url', url);
+    localStorage.setItem('sb_key', key);
+    document.getElementById('configPanel').style.display = 'none';
+  } else {
+    btn.textContent = '✓ Tentar novamente';
+    btn.disabled = false;
+  }
+}
+
+function demoMode() {
+  isDemoMode = true;
+  document.getElementById('configPanel').style.display = 'none';
+  setStatus(true, 'Demo mode');
+  startDemoInterval();
+}
+
+window.onload = () => {
+  const url = localStorage.getItem('sb_url');
+  const key = localStorage.getItem('sb_key');
+
+  if (url && key) {
+    document.getElementById('cfgUrl').value = url;
+    document.getElementById('cfgKey').value = key;
+    // Auto-reconnect silently; if it fails, show config panel again
+    initSupabase(url, key).then(ok => {
+      if (!ok) document.getElementById('configPanel').style.display = 'flex';
+      else document.getElementById('configPanel').style.display = 'none';
+    });
+  }
+
+  startClock();
+};
+
+// ============================================================
+// SUPABASE
+// ============================================================
+// URL e KEY ficam salvos globalmente para o polling usar
+let SB_URL = '';
+let SB_KEY = '';
+
+// Faz fetch direto à API REST do Supabase — sem SDK, sem SharedWorker, sem DataCloneError
+async function sbFetch(path, options) {
+  const res = await fetch(SB_URL + '/rest/v1/' + path, Object.assign({
+    headers: {
+      'apikey': SB_KEY,
+      'Authorization': 'Bearer ' + SB_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation'
+    }
+  }, options));
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.message || json.hint || JSON.stringify(json));
+  return json;
+}
+
+async function initSupabase(url, key) {
+  SB_URL = url.replace(/\/$/, '');
+  SB_KEY = key;
+
+  try {
+    // Testa conexão e busca pedidos de hoje — fetch puro, zero SDK
+    const today = new Date().toISOString().split('T')[0];
+    const data = await sbFetch(
+      'orders?select=*&created_at=gte.' + today + 'T00:00:00&order=created_at.desc'
+    );
+
+    data.forEach(function(o) { orders[o.id] = o; });
+    renderAll();
+    setStatus(true, 'Conectado ✓');
+    setupRealtime();
+    return true;
+
+  } catch (err) {
+    const msg = err && err.message ? err.message : String(err);
+    showConfigError('Erro ao buscar pedidos: ' + msg);
+    setStatus(false, 'Erro de conexão');
+    return false;
+  }
+}
+
+function setupRealtime() {
+  // Polling a cada 4 segundos — compatível com GitHub Pages e qualquer hospedagem.
+  // Evita o DataCloneError causado pelo SharedWorker do Supabase Realtime.
+  let lastChecked = new Date().toISOString();
+  let pollInterval = null;
+
+  async function poll() {
+    if (!supabaseClient) return;
+    try {
+      let data;
+      try {
+        data = await sbFetch('orders?select=*&created_at=gt.' + encodeURIComponent(lastChecked) + '&order=created_at.desc');
+      } catch(e) {
+        setStatus(false, 'Erro no polling: ' + (e.message || ''));
+        return;
+      }
+
+      if (data && data.length > 0) {
+        let hasNew = false;
+        data.forEach(o => {
+          if (!orders[o.id]) hasNew = true;
+          orders[o.id] = o;
+        });
+        lastChecked = new Date().toISOString();
+        renderAll();
+        if (hasNew) { playBeep(); showAlert(); }
+      }
+
+      // Also refresh status updates (preparing -> done etc.) every 8 polls (~32s)
+      poll.tick = (poll.tick || 0) + 1;
+      if (poll.tick % 8 === 0) refreshAll();
+
+      setStatus(true, 'Ao vivo ✓');
+    } catch(e) {
+      setStatus(false, 'Polling pausado — reconectando...');
+    }
+  }
+
+  pollInterval = setInterval(poll, 4000);
+  poll(); // run immediately on start
+}
+
+async function refreshAll() {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const data = await sbFetch('orders?select=*&created_at=gte.' + today + 'T00:00:00');
+    data.forEach(function(o) { orders[o.id] = o; });
+    renderAll();
+  } catch(e) {}
+}
+
+function showConfigError(msg) {
+  let errEl = document.getElementById('configError');
+  if (!errEl) {
+    errEl = document.createElement('div');
+    errEl.id = 'configError';
+    errEl.style.cssText = `
+      background: #ef4444; color: white; padding: 0.65rem 1rem;
+      border-radius: 8px; font-size: 0.82rem; margin-top: 0.5rem;
+      line-height: 1.4; word-break: break-word;
+    `;
+    document.querySelector('.config-box').appendChild(errEl);
+  }
+  errEl.textContent = '❌ ' + msg;
+}
+
+// ============================================================
+// STATUS UPDATE
+// ============================================================
+async function updateStatus(id, status) {
+  orders[id].status = status;
+  renderAll();
+  try {
+    await sbFetch('orders?id=eq.' + id, {
+      method: 'PATCH',
+      body: JSON.stringify({ status: status })
+    });
+  } catch(e) {
+    console.warn('Erro ao atualizar status:', e.message);
+  }
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function renderAll() {
+  const all = Object.values(orders);
+
+  const pending = all.filter(o => o.status === 'pending');
+  const preparing = all.filter(o => o.status === 'preparing');
+  const done = all.filter(o => o.status === 'done');
+
+  renderColumn('col-pending', pending, 'pending');
+  renderColumn('col-preparing', preparing, 'preparing');
+  renderColumn('col-done', done, 'done');
+
+  // Badges
+  document.getElementById('badge-pending').textContent = pending.length;
+  document.getElementById('badge-preparing').textContent = preparing.length;
+  document.getElementById('badge-done').textContent = done.length;
+
+  // Stats
+  document.getElementById('statPending').textContent = pending.length;
+  document.getElementById('statPreparing').textContent = preparing.length;
+  document.getElementById('statDone').textContent = done.length;
+  document.getElementById('statTotal').textContent = all.length;
+
+  const revenue = done.reduce((sum, o) => sum + (o.total || 0), 0);
+  document.getElementById('statRevenue').textContent =
+    revenue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+function renderColumn(colId, orderList, status) {
+  const col = document.getElementById(colId);
+
+  if (!orderList.length) {
+    const emptyMessages = {
+      pending: '<div class="empty-col"><div class="icon">✅</div><p>Nenhum pedido pendente</p></div>',
+      preparing: '<div class="empty-col"><div class="icon">👨‍🍳</div><p>Nenhum em preparo</p></div>',
+      done: '<div class="empty-col"><div class="icon">🍽️</div><p>Nenhum pronto ainda</p></div>',
+    };
+    col.innerHTML = emptyMessages[status];
+    return;
+  }
+
+  col.innerHTML = orderList
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    .map(o => renderCard(o))
+    .join('');
+}
+
+function renderCard(order) {
+  const num = order.order_number || order.id?.slice(0, 6);
+  const elapsed = getElapsed(order.created_at);
+  const elapsedClass = elapsed > 20 ? 'urgent' : elapsed > 10 ? 'warning' : '';
+
+  const itemsHtml = (order.items || []).map(item => `
+    <div class="order-item">
+      <div><span class="item-qty">×${item.qty}</span>${item.name}</div>
+    </div>
+  `).join('');
+
+  const obsHtml = order.observations
+    ? `<div class="obs-chip">⚠️ ${order.observations}</div>`
+    : '';
+
+  const tableLabel = order.table_number
+    ? `<span class="order-table">Mesa ${order.table_number}</span>`
+    : '';
+
+  let actionsHtml = '';
+  if (order.status === 'pending') {
+    actionsHtml = `<button class="action-btn btn-start" onclick="updateStatus('${order.id}', 'preparing')">▶ Iniciar Preparo</button>`;
+  } else if (order.status === 'preparing') {
+    actionsHtml = `<button class="action-btn btn-done" onclick="updateStatus('${order.id}', 'done')">✓ Marcar Pronto</button>`;
+  } else {
+    actionsHtml = `<button class="action-btn btn-archive" onclick="archiveOrder('${order.id}')">✕ Arquivar</button>`;
+  }
+
+  return `
+    <div class="order-card ${order.status}" id="order-${order.id}">
+      <div class="card-header">
+        <span class="order-num">#${String(num).padStart(3,'0')}</span>
+        <span class="order-client">${order.client_name}</span>
+        ${tableLabel}
+      </div>
+      <div class="card-body">
+        ${itemsHtml}
+        ${obsHtml}
+      </div>
+      <div class="card-footer">
+        <div class="timer ${elapsedClass}">⏱ ${elapsed}min</div>
+        ${actionsHtml}
+      </div>
+    </div>
+  `;
+}
+
+function getElapsed(created_at) {
+  const diff = (Date.now() - new Date(created_at).getTime()) / 60000;
+  return Math.floor(diff);
+}
+
+function archiveOrder(id) {
+  delete orders[id];
+  renderAll();
+}
+
+// ============================================================
+// STATUS & CLOCK
+// ============================================================
+function setStatus(online, label) {
+  const dot = document.getElementById('statusDot');
+  const text = document.getElementById('statusText');
+  dot.className = 'status-dot' + (online ? '' : ' offline');
+  text.textContent = label;
+}
+
+function startClock() {
+  function tick() {
+    const now = new Date();
+    document.getElementById('clock').textContent =
+      now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    // Update timers
+    document.querySelectorAll('.timer').forEach(el => {
+      // Handled via re-render below
+    });
+  }
+  tick();
+  setInterval(tick, 1000);
+  // Re-render timers every 30s
+  setInterval(() => renderAll(), 30000);
+}
+
+// ============================================================
+// ALERT & BEEP
+// ============================================================
+function showAlert() {
+  document.getElementById('alertBar').classList.add('show');
+}
+
+function dismissAlert() {
+  document.getElementById('alertBar').classList.remove('show');
+}
+
+function playBeep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [0, 0.15, 0.3].forEach(delay => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = 880;
+      gain.gain.setValueAtTime(0.4, ctx.currentTime + delay);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.2);
+      osc.start(ctx.currentTime + delay);
+      osc.stop(ctx.currentTime + delay + 0.2);
+    });
+  } catch(e) {}
+}
+
+// ============================================================
+// DEMO MODE
+// ============================================================
+const demoNames = ['Ana Paula', 'Carlos M.', 'Julia R.', 'Pedro L.', 'Beatriz S.', 'Rafael T.'];
+const demoItems = [
+  { id: 1, name: 'Bruschetta Clássica', qty: 2, price: 28.90 },
+  { id: 4, name: 'Tagliatelle al Ragù', qty: 1, price: 72.90 },
+  { id: 13, name: 'Tiramisù Originale', qty: 2, price: 34.90 },
+  { id: 10, name: 'Vinho Chianti', qty: 1, price: 34.90 },
+  { id: 7, name: 'Saltimbocca alla Romana', qty: 1, price: 98.90 },
+  { id: 5, name: 'Risotto ai Funghi', qty: 2, price: 68.90 },
+];
+
+let demoCounter = 1;
+
+function startDemoInterval() {
+  // Add a few initial demo orders
+  addDemoOrder();
+  setTimeout(addDemoOrder, 1500);
+  setTimeout(addDemoOrder, 3000);
+
+  // Add new orders every 15s
+  demoInterval = setInterval(addDemoOrder, 15000);
+}
+
+function addDemoOrder() {
+  const id = 'demo-' + Date.now();
+  const numItems = Math.floor(Math.random() * 3) + 1;
+  const shuffled = [...demoItems].sort(() => 0.5 - Math.random()).slice(0, numItems);
+  const total = shuffled.reduce((s, i) => s + i.price * i.qty, 0);
+
+  orders[id] = {
+    id,
+    order_number: demoCounter++,
+    client_name: demoNames[Math.floor(Math.random() * demoNames.length)],
+    table_number: Math.floor(Math.random() * 10) + 1,
+    items: shuffled,
+    observations: Math.random() > 0.7 ? 'Sem cebola' : null,
+    total,
+    status: 'pending',
+    created_at: new Date().toISOString()
+  };
+
+  renderAll();
+  playBeep();
+  showAlert();
+}
+</script>
+</body>
+</html>
