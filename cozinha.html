@@ -450,6 +450,8 @@
     .column { max-height: 60vh; }
   }
 </style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0F1117">
 </head>
 <body>
 
@@ -483,6 +485,12 @@
       <span class="status-dot" id="statusDot"></span>
       <span id="statusText">Conectando...</span>
     </div>
+    <button id="pushBtn" onclick="registerKitchenPush()" style="
+      background:#F97316;color:white;border:none;border-radius:8px;
+      padding:0.4rem 0.9rem;font-size:0.8rem;font-weight:600;cursor:pointer;
+      font-family:'DM Sans',sans-serif;white-space:nowrap;">
+      🔔 Ativar notificações
+    </button>
     <div class="clock" id="clock"></div>
   </div>
 </div>
@@ -633,16 +641,28 @@ async function sbFetch(path, options) {
   return json;
 }
 
+// Retorna meia-noite do dia atual no fuso local do dispositivo, em formato ISO UTC
+// Funciona em qualquer fuso — BRT, GMT, etc — sem hardcodar UTC-3
+function localMidnightUTC() {
+  const now = new Date();
+  const localMidnight = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    0, 0, 0, 0
+  );
+  return localMidnight.toISOString();
+}
+
 async function initSupabase(url, key) {
   SB_URL = url.replace(/\/$/, '');
   SB_KEY = key;
 
   try {
     // Testa conexão e busca pedidos de hoje — fetch puro, zero SDK
-    const today = new Date().toISOString().split('T')[0];
-    const data = await sbFetch(
-      'orders?select=*&created_at=gte.' + today + 'T00:00:00&order=created_at.desc'
-    );
+    // Cutoff = meia-noite do dia atual no fuso local do dispositivo
+    const cutoff = localMidnightUTC();
+    const data = await sbFetch('orders?select=*&created_at=gte.' + cutoff + '&order=created_at.desc');
 
     data.forEach(function(o) { orders[o.id] = o; });
     renderAll();
@@ -683,7 +703,7 @@ function setupRealtime() {
         });
         lastChecked = new Date().toISOString();
         renderAll();
-        if (hasNew) { playBeep(); showAlert(); }
+        if (hasNew) { playBeep(); showAlert(); data.forEach(function(o){ if(!orders[o.id]) notifyKitchen(o); }); }
       }
 
       // Also refresh status updates (preparing -> done etc.) every 8 polls (~32s)
@@ -702,8 +722,7 @@ function setupRealtime() {
 
 async function refreshAll() {
   try {
-    const today = new Date().toISOString().split('T')[0];
-    const data = await sbFetch('orders?select=*&created_at=gte.' + today + 'T00:00:00');
+    const data = await sbFetch('orders?select=*&created_at=gte.' + localMidnightUTC());
     data.forEach(function(o) { orders[o.id] = o; });
     renderAll();
   } catch(e) {}
@@ -735,6 +754,11 @@ async function updateStatus(id, status) {
       method: 'PATCH',
       body: JSON.stringify({ status: status })
     });
+    // Notify client about status change (preparing or done)
+    if (status === 'preparing' || status === 'done') {
+      const o = orders[id];
+      notifyClient(id, status, o.client_name, o.table_number);
+    }
   } catch(e) {
     console.warn('Erro ao atualizar status:', e.message);
   }
@@ -844,6 +868,98 @@ function getElapsed(created_at) {
 function archiveOrder(id) {
   delete orders[id];
   renderAll();
+}
+
+
+// ============================================================
+// PUSH NOTIFICATIONS — Cozinha
+// ============================================================
+const VAPID_PUBLIC_KEY_K = 'BDzD3jLwiAtEYJcfEx2vtlkrYTOYH1AT1J7scM-SomEBwlWvACgZ78eHE78sE0GCG48OibE702UIGlSfUxA_Gtk';
+const EDGE_URL_K = 'https://iejbicssmxjgrxitpcpf.supabase.co/functions/v1/send-push';
+
+function urlB64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = atob(base64);
+  return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
+}
+
+async function registerKitchenPush() {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    console.warn('Push não suportado neste dispositivo');
+    return;
+  }
+  try {
+    const reg = await navigator.serviceWorker.register('/sw.js');
+    await navigator.serviceWorker.ready;
+
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') {
+      alert('Permita notificações para receber alertas de novos pedidos!');
+      return;
+    }
+
+    // Check if already subscribed
+    const existing = await reg.pushManager.getSubscription();
+    const sub = existing || await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlB64ToUint8Array(VAPID_PUBLIC_KEY_K)
+    });
+
+    // Save kitchen subscription to DB
+    await sbFetch('push_subscriptions', {
+      method: 'POST',
+      body: JSON.stringify({
+        role: 'kitchen',
+        subscription: sub.toJSON(),
+        created_at: new Date().toISOString()
+      })
+    });
+
+    document.getElementById('pushBtn').textContent = '🔔 Notificações ativas';
+    document.getElementById('pushBtn').style.background = '#10B981';
+    console.log('Kitchen push registered');
+  } catch(e) {
+    console.warn('Kitchen push failed:', e.message);
+    alert('Erro ao ativar notificações: ' + e.message);
+  }
+}
+
+// Called from updateStatus — notifies client when their order status changes
+async function notifyClient(orderId, status, clientName, tableNumber) {
+  try {
+    await fetch(EDGE_URL_K, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + SB_KEY
+      },
+      body: JSON.stringify({ type: 'client', orderId, status, clientName, tableNumber })
+    });
+  } catch(e) {
+    console.warn('Client push failed:', e.message);
+  }
+}
+
+// Called from polling — notifies kitchen when new order arrives
+async function notifyKitchen(order) {
+  try {
+    await fetch(EDGE_URL_K, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + SB_KEY
+      },
+      body: JSON.stringify({
+        type: 'kitchen',
+        orderId: order.id,
+        clientName: order.client_name,
+        tableNumber: order.table_number
+      })
+    });
+  } catch(e) {
+    console.warn('Kitchen push failed:', e.message);
+  }
 }
 
 // ============================================================
