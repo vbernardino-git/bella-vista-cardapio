@@ -602,6 +602,23 @@ function demoMode() {
   startDemoInterval();
 }
 
+// Event delegation — handles all order action buttons robustly
+// Uses data attributes instead of inline onclick to avoid UUID escaping issues
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('[data-id]');
+  if (!btn) return;
+
+  const id      = btn.getAttribute('data-id');
+  const status  = btn.getAttribute('data-status');
+  const archive = btn.getAttribute('data-archive');
+
+  if (archive) {
+    archiveOrder(id);
+  } else if (status) {
+    updateStatus(id, status);
+  }
+});
+
 window.onload = () => {
   const url = localStorage.getItem('sb_url');
   const key = localStorage.getItem('sb_key');
@@ -864,11 +881,11 @@ function renderCard(order) {
 
   let actionsHtml = '';
   if (order.status === 'pending') {
-    actionsHtml = `<button class="action-btn btn-start" onclick="updateStatus('${order.id}', 'preparing')">▶ Iniciar Preparo</button>`;
+    actionsHtml = `<button class="action-btn btn-start" data-id="${order.id}" data-status="preparing">▶ Iniciar Preparo</button>`;
   } else if (order.status === 'preparing') {
-    actionsHtml = `<button class="action-btn btn-done" onclick="updateStatus('${order.id}', 'done')">✓ Marcar Pronto</button>`;
+    actionsHtml = `<button class="action-btn btn-done" data-id="${order.id}" data-status="done">✓ Marcar Pronto</button>`;
   } else {
-    actionsHtml = `<button class="action-btn btn-archive" onclick="archiveOrder('${order.id}')">✕ Arquivar</button>`;
+    actionsHtml = `<button class="action-btn btn-archive" data-id="${order.id}" data-archive="1">✕ Arquivar</button>`;
   }
 
   return `
