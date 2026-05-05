@@ -641,17 +641,24 @@ async function sbFetch(path, options) {
   return json;
 }
 
-// Retorna meia-noite do dia atual no fuso local do dispositivo, em formato ISO UTC
-// Funciona em qualquer fuso — BRT, GMT, etc — sem hardcodar UTC-3
+// Retorna o início do "dia do restaurante" em UTC.
+// Definição: o dia começa às 03:00 UTC (= 00:00 BRT).
+// Pedidos das 22h, 23h de uma sexta entram no "dia sexta", não no sábado.
 function localMidnightUTC() {
   const now = new Date();
-  const localMidnight = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate(),
-    0, 0, 0, 0
-  );
-  return localMidnight.toISOString();
+  // Início do dia do restaurante = hoje às 03:00 UTC
+  const cutoff = new Date(Date.UTC(
+    now.getUTCFullYear(),
+    now.getUTCMonth(),
+    now.getUTCDate(),
+    3, 0, 0, 0  // 03:00 UTC = 00:00 BRT
+  ));
+  // Se agora é antes das 03:00 UTC (ex: 01:00 UTC = 22:00 BRT da véspera),
+  // o "dia do restaurante" ainda é o de ontem — recua 1 dia
+  if (now.getTime() < cutoff.getTime()) {
+    cutoff.setUTCDate(cutoff.getUTCDate() - 1);
+  }
+  return cutoff.toISOString();
 }
 
 async function initSupabase(url, key) {
