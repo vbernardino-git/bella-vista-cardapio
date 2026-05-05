@@ -686,45 +686,55 @@ async function initSupabase(url, key) {
 }
 
 function setupRealtime() {
-  // Polling a cada 4 segundos — compatível com GitHub Pages e qualquer hospedagem.
-  // Evita o DataCloneError causado pelo SharedWorker do Supabase Realtime.
+  // Polling a cada 4 segundos usando sbFetch puro (sem SDK)
   let lastChecked = new Date().toISOString();
-  let pollInterval = null;
+  let tick = 0;
 
   async function poll() {
-    if (!supabaseClient) return;
+    // Checa se sbFetch está disponível (SB_URL preenchido após login)
+    if (!SB_URL) return;
+
     try {
-      let data;
-      try {
-        data = await sbFetch('orders?select=*&created_at=gt.' + encodeURIComponent(lastChecked) + '&order=created_at.desc');
-      } catch(e) {
-        setStatus(false, 'Erro no polling: ' + (e.message || ''));
-        return;
-      }
+      // Busca apenas pedidos mais novos que o último check
+      const data = await sbFetch(
+        'orders?select=*&created_at=gt.' + encodeURIComponent(lastChecked) + '&order=created_at.asc'
+      );
 
       if (data && data.length > 0) {
-        let hasNew = false;
-        data.forEach(o => {
-          if (!orders[o.id]) hasNew = true;
-          orders[o.id] = o;
-        });
-        lastChecked = new Date().toISOString();
+        // Detecta novos ANTES de adicionar ao objeto orders
+        const novos = data.filter(o => !orders[o.id]);
+
+        // Adiciona/atualiza todos no estado
+        data.forEach(o => { orders[o.id] = o; });
+
+        // Avança o cursor de tempo
+        lastChecked = data[data.length - 1].created_at;
+
         renderAll();
-        if (hasNew) { playBeep(); showAlert(); data.forEach(function(o){ if(!orders[o.id]) notifyKitchen(o); }); }
+
+        if (novos.length > 0) {
+          playBeep();
+          showAlert();
+          novos.forEach(o => notifyKitchen(o));
+        }
       }
 
-      // Also refresh status updates (preparing -> done etc.) every 8 polls (~32s)
-      poll.tick = (poll.tick || 0) + 1;
-      if (poll.tick % 8 === 0) refreshAll();
+      // A cada 8 ciclos (~32s) faz um refresh completo do dia para pegar
+      // atualizações de status (pending → preparing → done)
+      tick++;
+      if (tick % 8 === 0) refreshAll();
 
       setStatus(true, 'Ao vivo ✓');
+
     } catch(e) {
       setStatus(false, 'Polling pausado — reconectando...');
+      console.warn('Poll error:', e.message || e);
     }
   }
 
-  pollInterval = setInterval(poll, 4000);
-  poll(); // run immediately on start
+  // Roda imediatamente e depois a cada 4s
+  poll();
+  setInterval(poll, 4000);
 }
 
 async function refreshAll() {
