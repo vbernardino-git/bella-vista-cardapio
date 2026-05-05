@@ -764,20 +764,33 @@ function showConfigError(msg) {
 // STATUS UPDATE
 // ============================================================
 async function updateStatus(id, status) {
+  // Optimistic update — mostra na tela imediatamente
   orders[id].status = status;
   renderAll();
+
   try {
-    await sbFetch('orders?id=eq.' + id, {
+    const res = await fetch(SB_URL + '/rest/v1/orders?id=eq.' + id, {
       method: 'PATCH',
+      headers: {
+        'apikey': SB_KEY,
+        'Authorization': 'Bearer ' + SB_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
       body: JSON.stringify({ status: status })
     });
-    // Notify client about status change (preparing or done)
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || 'HTTP ' + res.status);
+    }
+    // Notifica cliente se status relevante
     if (status === 'preparing' || status === 'done') {
       const o = orders[id];
       notifyClient(id, status, o.client_name, o.table_number);
     }
   } catch(e) {
-    console.warn('Erro ao atualizar status:', e.message);
+    console.warn('Erro ao atualizar status:', e.message || e);
+    showAlert('❌ Erro ao atualizar pedido: ' + (e.message || e));
   }
 }
 

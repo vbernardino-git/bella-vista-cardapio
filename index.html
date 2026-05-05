@@ -380,12 +380,13 @@
     border-radius: 24px 24px 0 0;
     width: 100%;
     max-width: 600px;
-    max-height: 85vh;
+    max-height: 90vh;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     animation: slideUp 0.3s ease;
   }
+
 
   @keyframes slideUp {
     from { transform: translateY(100%); }
@@ -425,6 +426,8 @@
     overflow-y: auto;
     flex: 1;
     padding: 1rem 1.5rem;
+    /* Limit height so footer/button always stays visible */
+    max-height: 45vh;
   }
 
   .cart-item {
@@ -473,6 +476,7 @@
     padding: 1.25rem 1.5rem;
     border-top: 2px solid var(--border);
     background: var(--card-bg);
+    flex-shrink: 0; /* always visible, never pushed off screen */
   }
 
   .cart-total {
@@ -627,6 +631,8 @@
     .item-name { font-size: 0.95rem; }
   }
 </style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1A1209">
 </head>
 <body>
 
@@ -1066,6 +1072,7 @@ async function submitOrder() {
 
     // Sucesso
     document.getElementById('orderNum').textContent = `#${String(orderCounter).padStart(3,'0')}`;
+    registerPushClient(String(orderCounter));
     document.getElementById('cartContent').style.display = 'none';
     document.getElementById('successScreen').classList.add('show');
 
@@ -1096,6 +1103,62 @@ function showToast(msg) {
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+
+// ============================================================
+// PUSH NOTIFICATIONS — Cliente
+// ============================================================
+const VAPID_PUBLIC_KEY = 'BDzD3jLwiAtEYJcfEx2vtlkrYTOYH1AT1J7scM-SomEBwlWvACgZ78eHE78sE0GCG48OibE702UIGlSfUxA_Gtk';
+const EDGE_FUNCTION_URL = 'https://iejbicssmxjgrxitpcpf.supabase.co/functions/v1/send-push';
+const ANON_KEY_PUSH = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllamJpY3NzbXhqZ3J4aXRwY3BmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3ODMyOTUsImV4cCI6MjA5MzM1OTI5NX0.NBXgFNEKzqpqMv1CtNzyRyw4bntflyH1sVw9-Ie6S_w';
+
+let pushOrderId = null;
+
+function urlB64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = atob(base64);
+  return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
+}
+
+async function registerPushClient(orderId) {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+  pushOrderId = orderId;
+
+  try {
+    const reg = await navigator.serviceWorker.register('/sw.js');
+    await navigator.serviceWorker.ready;
+
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') return;
+
+    const sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlB64ToUint8Array(VAPID_PUBLIC_KEY)
+    });
+
+    // Save subscription to DB linking to this order
+    await fetch(SUPABASE_URL.replace(/\/$/, '') + '/rest/v1/push_subscriptions', {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({
+        order_id: orderId,
+        role: 'client',
+        subscription: sub.toJSON(),
+        created_at: new Date().toISOString()
+      })
+    });
+
+    console.log('Push subscription saved for order', orderId);
+  } catch(e) {
+    console.warn('Push registration failed:', e.message);
+  }
 }
 
 // ============================================================
