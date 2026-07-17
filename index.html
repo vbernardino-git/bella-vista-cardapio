@@ -2,703 +2,282 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Restaurante Bella Vista — Cardápio</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Santa Fé — Lanchonete & Restaurante | Cardápio Vila Olímpia</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<!-- Supabase SDK removido: usando fetch puro -->
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#1A1209">
 <style>
-  :root {
-    --cream: #F9F5EE;
-    --dark: #1A1209;
-    --gold: #C8962A;
-    --gold-light: #E8B84B;
-    --rust: #A0412A;
-    --text: #3D2B0F;
-    --muted: #8B7355;
-    --card-bg: #FFFDF7;
-    --border: #E8DEC8;
+  :root{
+    --cream:#F9F5EE; --cream-2:#F3ECDF; --dark:#1A1209; --dark-2:#2A1D0E;
+    --gold:#C8962A; --gold-light:#E8B84B; --rust:#A0412A; --text:#3D2B0F;
+    --muted:#8B7355; --card-bg:#FFFDF7; --border:#E8DEC8; --border-2:#DED2B6;
+    --green:#2D6A4F; --blue:#2C5F8A;
+    --shadow-sm:0 2px 8px rgba(26,18,9,.06);
+    --shadow:0 8px 28px rgba(26,18,9,.10);
+    --shadow-lg:0 16px 44px rgba(26,18,9,.22);
   }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--cream);color:var(--text);font-family:'DM Sans',system-ui,sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+  img{max-width:100%;}
+  ::selection{background:var(--gold);color:var(--dark);}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    background: var(--cream);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    min-height: 100vh;
+  /* ---------- HEADER ---------- */
+  header{
+    background:linear-gradient(160deg,var(--dark) 0%,var(--dark-2) 100%);
+    color:var(--cream); padding:2rem 1.25rem 1.5rem; position:relative; overflow:hidden;
+    text-align:center;
   }
-
-  /* HEADER */
-  header {
-    background: var(--dark);
-    color: var(--cream);
-    text-align: center;
-    padding: 2.5rem 1rem 2rem;
-    position: relative;
-    overflow: hidden;
-  }
-
-  header::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse at 50% 120%, rgba(200,150,42,0.25) 0%, transparent 70%);
-  }
-
-  .header-ornament {
-    font-size: 0.75rem;
-    letter-spacing: 0.3em;
-    color: var(--gold);
-    text-transform: uppercase;
-    margin-bottom: 0.75rem;
-  }
-
-  header h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(2rem, 7vw, 3.2rem);
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    position: relative;
-  }
-
-  header p {
-    color: rgba(249,245,238,0.6);
-    margin-top: 0.5rem;
-    font-size: 0.9rem;
-    font-weight: 300;
-  }
-
-  /* NAME INPUT */
-  .name-banner {
-    background: var(--gold);
-    padding: 0.85rem 1.25rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.65rem;
-  }
-
-  .name-row {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    width: 100%;
-  }
-
-  .name-banner label {
-    color: var(--dark);
-    font-weight: 500;
-    font-size: 0.9rem;
-    white-space: nowrap;
-  }
-
-  .name-banner input {
-    flex: 1;
-    padding: 0.55rem 1rem;
-    border: none;
-    border-radius: 6px;
-    background: rgba(255,255,255,0.9);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.95rem;
-    color: var(--dark);
-    outline: none;
-    transition: box-shadow 0.2s;
-  }
-
-  .name-banner input:focus {
-    box-shadow: 0 0 0 3px rgba(26,18,9,0.2);
-  }
-
-  /* CATEGORIES NAV */
-  .categories {
-    display: flex;
-    gap: 0.5rem;
-    padding: 1.25rem 1rem;
-    overflow-x: auto;
-    background: var(--card-bg);
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    scrollbar-width: none;
-  }
-
-  .categories::-webkit-scrollbar { display: none; }
-
-  .cat-btn {
-    padding: 0.5rem 1.1rem;
-    border-radius: 100px;
-    border: 1.5px solid var(--border);
-    background: transparent;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--muted);
-    cursor: pointer;
-    white-space: nowrap;
-    transition: all 0.2s;
-  }
-
-  .cat-btn.active, .cat-btn:hover {
-    background: var(--dark);
-    border-color: var(--dark);
-    color: var(--cream);
-  }
-
-  /* MENU SECTIONS */
-  .menu-container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 1.5rem 1rem 8rem;
-  }
-
-  .section-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.6rem;
-    color: var(--dark);
-    margin: 2rem 0 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid var(--gold);
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-
-  .section-title .emoji { font-size: 1.3rem; }
-
-  /* ITEM CARDS */
-  .items-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .item-card {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    display: flex;
-    gap: 1rem;
-    padding: 1rem;
-    transition: box-shadow 0.2s, transform 0.2s;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .item-card:hover {
-    box-shadow: 0 4px 20px rgba(26,18,9,0.08);
-    transform: translateY(-1px);
-  }
-
-  .item-img {
-    width: 90px;
-    height: 90px;
-    border-radius: 12px;
-    object-fit: cover;
-    flex-shrink: 0;
-    background: linear-gradient(135deg, #E8DEC8, #C8B895);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2.2rem;
-    overflow: hidden;
-  }
-
-  .item-img img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 12px;
-    display: block;
-  }
-
-  .item-img .emoji-fallback {
-    font-size: 2.2rem;
-    line-height: 1;
-  }
-
-  .item-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    min-width: 0;
-  }
-
-  .item-name {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.05rem;
-    color: var(--dark);
-    font-weight: 600;
-  }
-
-  .item-desc {
-    font-size: 0.8rem;
-    color: var(--muted);
-    margin-top: 0.25rem;
-    line-height: 1.4;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .item-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 0.5rem;
-  }
-
-  .item-price {
-    font-weight: 700;
-    font-size: 1rem;
-    color: var(--rust);
-  }
-
-  .add-btn {
-    background: var(--dark);
-    color: var(--cream);
-    border: none;
-    border-radius: 8px;
-    padding: 0.4rem 0.9rem;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-  }
-
-  .add-btn:hover { background: var(--gold); color: var(--dark); }
-  .add-btn:active { transform: scale(0.95); }
-
-  /* QTY CONTROL */
-  .qty-control {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: var(--cream);
-    border-radius: 8px;
-    padding: 0.25rem;
-    border: 1.5px solid var(--border);
-  }
-
-  .qty-btn {
-    width: 28px;
-    height: 28px;
-    border: none;
-    background: var(--dark);
-    color: var(--cream);
-    border-radius: 6px;
-    font-size: 1rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s;
-  }
-
-  .qty-btn:hover { background: var(--gold); color: var(--dark); }
-
-  .qty-num {
-    font-weight: 700;
-    font-size: 0.95rem;
-    min-width: 20px;
-    text-align: center;
-  }
-
-  /* BADGE */
-  .badge {
-    position: absolute;
-    top: 0.6rem;
-    right: 0.6rem;
-    background: var(--gold);
-    color: var(--dark);
-    font-size: 0.65rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-  }
-
-  /* CART BUTTON */
-  .cart-fab {
-    position: fixed;
-    bottom: 1.5rem;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--dark);
-    color: var(--cream);
-    border: none;
-    border-radius: 100px;
-    padding: 1rem 2rem;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    box-shadow: 0 8px 32px rgba(26,18,9,0.35);
-    transition: transform 0.2s, background 0.2s;
-    z-index: 100;
-    min-width: 260px;
-    justify-content: center;
-  }
-
-  .cart-fab:hover { background: var(--gold); color: var(--dark); transform: translateX(-50%) translateY(-2px); }
-  .cart-fab.hidden { display: none; }
-
-  .cart-count {
-    background: var(--gold);
-    color: var(--dark);
-    border-radius: 100px;
-    padding: 0.1rem 0.6rem;
-    font-size: 0.85rem;
-    font-weight: 800;
-  }
-
-  /* CART MODAL */
-  .overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(26,18,9,0.6);
-    z-index: 200;
-    display: none;
-    align-items: flex-end;
-    justify-content: center;
-  }
-
-  .overlay.open { display: flex; }
-
-  .cart-modal {
-    background: var(--cream);
-    border-radius: 24px 24px 0 0;
-    width: 100%;
-    max-width: 600px;
-    max-height: 90vh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    animation: slideUp 0.3s ease;
-  }
-
-
-  @keyframes slideUp {
-    from { transform: translateY(100%); }
-    to { transform: translateY(0); }
-  }
-
-  .cart-header {
-    padding: 1.5rem 1.5rem 1rem;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .cart-header h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.4rem;
-  }
-
-  .close-btn {
-    background: var(--border);
-    border: none;
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s;
-  }
-
-  .close-btn:hover { background: var(--dark); color: var(--cream); }
-
-  .cart-items {
-    overflow-y: auto;
-    flex: 1;
-    padding: 1rem 1.5rem;
-    /* Limit height so footer/button always stays visible */
-    max-height: 45vh;
-  }
-
-  .cart-item {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.75rem 0;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .cart-item-name {
-    flex: 1;
-    font-weight: 500;
-    font-size: 0.95rem;
-  }
-
-  .cart-item-qty {
-    color: var(--muted);
-    font-size: 0.85rem;
-    min-width: 30px;
-    text-align: center;
-  }
-
-  .cart-item-price {
-    font-weight: 700;
-    color: var(--rust);
-    min-width: 70px;
-    text-align: right;
-    font-size: 0.95rem;
-  }
-
-  .cart-remove {
-    background: none;
-    border: none;
-    color: var(--muted);
-    cursor: pointer;
-    font-size: 1rem;
-    padding: 0.25rem;
-    border-radius: 4px;
-    transition: color 0.2s;
-  }
-
-  .cart-remove:hover { color: var(--rust); }
-
-  .cart-footer {
-    padding: 1.25rem 1.5rem;
-    border-top: 2px solid var(--border);
-    background: var(--card-bg);
-    flex-shrink: 0; /* always visible, never pushed off screen */
-  }
-
-  .cart-total {
-    display: flex;
-    justify-content: space-between;
-    font-size: 1.15rem;
-    font-weight: 700;
-    margin-bottom: 1rem;
-  }
-
-  .cart-total .total-val { color: var(--rust); font-size: 1.3rem; }
-
-  .confirm-btn {
-    width: 100%;
-    background: var(--gold);
-    color: var(--dark);
-    border: none;
-    border-radius: 12px;
-    padding: 1rem;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 1rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
-    letter-spacing: 0.02em;
-  }
-
-  .confirm-btn:hover { background: var(--gold-light); }
-  .confirm-btn:active { transform: scale(0.98); }
-  .confirm-btn:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
-
-  /* SUCCESS */
-  .success-screen {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 3rem 2rem;
-    text-align: center;
-    gap: 1rem;
-  }
-
-  .success-screen.show { display: flex; }
-
-  .success-icon {
-    width: 72px;
-    height: 72px;
-    background: #2D6A4F;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2rem;
-    animation: pop 0.4s ease;
-  }
-
-  @keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
-
-  .success-screen h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.5rem;
-    color: var(--dark);
-  }
-
-  .success-screen p { color: var(--muted); font-size: 0.9rem; }
-
-  .order-num {
-    font-size: 2rem;
-    font-weight: 800;
-    color: var(--gold);
-    letter-spacing: 0.05em;
-  }
-
-  /* EMPTY CART */
-  .empty-cart {
-    padding: 2rem;
-    text-align: center;
-    color: var(--muted);
-  }
-
-  .empty-cart .icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
-
-  @media (max-width: 500px) {
-    .item-img { width: 75px; height: 75px; }
-    .item-img .emoji-fallback { font-size: 1.8rem; }
-    .item-name { font-size: 0.95rem; }
-  }
-
-  /* OBSERVATION */
-  .obs-wrap {
-    padding: 0.75rem 1.5rem 0;
-  }
-
-  .obs-wrap label {
-    font-size: 0.8rem;
-    color: var(--muted);
-    font-weight: 500;
-    display: block;
-    margin-bottom: 0.4rem;
-  }
-
-  .obs-wrap textarea {
-    width: 100%;
-    padding: 0.6rem 0.9rem;
-    border: 1.5px solid var(--border);
-    border-radius: 8px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.85rem;
-    background: var(--cream);
-    color: var(--text);
-    resize: none;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-
-  .obs-wrap textarea:focus { border-color: var(--gold); }
-
-  .loading-spinner {
-    display: inline-block;
-    width: 18px; height: 18px;
-    border: 2px solid rgba(26,18,9,0.3);
-    border-top-color: var(--dark);
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* TOAST */
-  .toast {
-    position: fixed;
-    top: 1rem;
-    right: 1rem;
-    background: var(--dark);
-    color: var(--cream);
-    padding: 0.75rem 1.25rem;
-    border-radius: 10px;
-    font-size: 0.9rem;
-    z-index: 999;
-    transform: translateY(-80px);
-    opacity: 0;
-    transition: all 0.3s;
-  }
-
-  .toast.show {
-    transform: translateY(0);
-    opacity: 1;
-  }
-
-  @media (max-width: 500px) {
-    .item-img { width: 75px; height: 75px; font-size: 1.8rem; }
-    .item-name { font-size: 0.95rem; }
-  }
+  header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 130%,rgba(200,150,42,.28) 0%,transparent 65%);}
+  header::after{content:'';position:absolute;left:0;right:0;bottom:0;height:3px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+  .brand-mark{position:relative;font-size:.7rem;letter-spacing:.32em;color:var(--gold-light);text-transform:uppercase;margin-bottom:.5rem;font-weight:600;}
+  header h1{position:relative;font-family:'Playfair Display',serif;font-size:clamp(2.2rem,9vw,3.4rem);font-weight:700;line-height:1;}
+  header h1 .dot{color:var(--gold);}
+  .info-row{position:relative;display:flex;gap:.4rem;justify-content:center;flex-wrap:wrap;margin-top:1rem;}
+  .info-pill{background:rgba(249,245,238,.10);border:1px solid rgba(232,184,75,.25);color:rgba(249,245,238,.9);
+    font-size:.72rem;font-weight:500;padding:.32rem .7rem;border-radius:100px;backdrop-filter:blur(4px);}
+  .info-pill b{color:var(--gold-light);font-weight:600;}
+
+  /* ---------- SEARCH BAR (sticky) ---------- */
+  .searchbar{position:sticky;top:0;z-index:40;background:var(--cream);padding:.85rem 1rem;border-bottom:1px solid var(--border);
+    box-shadow:0 4px 16px rgba(26,18,9,.04);}
+  .search-inner{max-width:820px;margin:0 auto;position:relative;display:flex;align-items:center;}
+  .search-inner .lupa{position:absolute;left:1rem;font-size:1rem;opacity:.55;pointer-events:none;}
+  #searchInput{width:100%;padding:.85rem 2.6rem .85rem 2.7rem;border:1.5px solid var(--border-2);border-radius:100px;
+    background:var(--card-bg);font-family:inherit;font-size:.95rem;color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s;}
+  #searchInput::placeholder{color:var(--muted);}
+  #searchInput:focus{border-color:var(--gold);box-shadow:0 0 0 4px rgba(200,150,42,.14);}
+  .search-clear{position:absolute;right:.6rem;background:var(--border);border:none;width:30px;height:30px;border-radius:50%;
+    font-size:.9rem;cursor:pointer;color:var(--dark);display:none;align-items:center;justify-content:center;transition:background .2s;}
+  .search-clear:hover{background:var(--gold);}
+  .search-clear.show{display:flex;}
+
+  /* ---------- APP CONTAINER ---------- */
+  main{max-width:820px;margin:0 auto;padding:1.25rem 1rem 7.5rem;}
+  .block-title{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--dark);margin:.5rem 0 1rem;display:flex;align-items:center;gap:.6rem;}
+  .block-title .line{flex:1;height:2px;background:linear-gradient(90deg,var(--gold),transparent);border-radius:2px;}
+
+  /* ---------- HOME: DESTAQUES ---------- */
+  .featured-scroll{display:flex;gap:.75rem;overflow-x:auto;padding:.25rem .25rem 1rem;scroll-snap-type:x mandatory;scrollbar-width:none;margin:0 -.25rem;}
+  .featured-scroll::-webkit-scrollbar{display:none;}
+  .feat-card{scroll-snap-align:start;flex:0 0 auto;width:158px;background:var(--card-bg);border:1px solid var(--border);border-radius:16px;
+    padding:.9rem;display:flex;flex-direction:column;gap:.5rem;box-shadow:var(--shadow-sm);position:relative;transition:transform .18s,box-shadow .18s;}
+  .feat-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);}
+  .feat-emoji{font-size:2.4rem;line-height:1;filter:drop-shadow(0 3px 5px rgba(26,18,9,.12));}
+  .feat-name{font-family:'Playfair Display',serif;font-size:.95rem;font-weight:600;color:var(--dark);line-height:1.15;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.2em;}
+  .feat-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:auto;}
+  .feat-price{font-weight:700;color:var(--rust);font-size:.95rem;}
+
+  /* ---------- HOME: CATEGORY GRID ---------- */
+  .cat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.8rem;}
+  @media(min-width:620px){.cat-grid{grid-template-columns:repeat(3,1fr);}}
+  .cat-card{background:var(--card-bg);border:1px solid var(--border);border-radius:18px;padding:1.15rem 1rem;cursor:pointer;
+    display:flex;flex-direction:column;gap:.35rem;box-shadow:var(--shadow-sm);transition:transform .18s,box-shadow .18s,border-color .18s;text-align:left;position:relative;overflow:hidden;}
+  .cat-card::after{content:'';position:absolute;right:-30px;top:-30px;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,rgba(200,150,42,.10),transparent 70%);}
+  .cat-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--gold);}
+  .cat-card:active{transform:scale(.98);}
+  .cat-ic{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--cream-2),#EADFC5);display:flex;align-items:center;justify-content:center;font-size:1.7rem;margin-bottom:.35rem;}
+  .cat-label{font-family:'Playfair Display',serif;font-size:1.02rem;font-weight:600;color:var(--dark);line-height:1.15;}
+  .cat-count{font-size:.75rem;color:var(--muted);font-weight:500;}
+
+  /* ---------- CATEGORY VIEW ---------- */
+  .subbar{position:sticky;top:64px;z-index:30;background:var(--cream);padding:.6rem 0 .3rem;margin:-.25rem -1rem .5rem;padding-left:1rem;padding-right:1rem;border-bottom:1px solid var(--border);}
+  .backrow{display:flex;align-items:center;gap:.6rem;margin-bottom:.6rem;}
+  .back-btn{background:var(--dark);color:var(--cream);border:none;width:38px;height:38px;border-radius:12px;font-size:1.1rem;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background .2s;}
+  .back-btn:hover{background:var(--gold);color:var(--dark);}
+  .backrow h2{font-family:'Playfair Display',serif;font-size:1.35rem;color:var(--dark);display:flex;align-items:center;gap:.45rem;}
+  .chips{display:flex;gap:.45rem;overflow-x:auto;padding-bottom:.5rem;scrollbar-width:none;}
+  .chips::-webkit-scrollbar{display:none;}
+  .chip{flex:0 0 auto;padding:.42rem .9rem;border-radius:100px;border:1.5px solid var(--border-2);background:var(--card-bg);
+    font-size:.82rem;font-weight:500;color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .18s;}
+  .chip:hover{border-color:var(--gold);color:var(--dark);}
+  .chip.active{background:var(--dark);border-color:var(--dark);color:var(--cream);}
+
+  /* ---------- ITEM CARDS ---------- */
+  .items{display:flex;flex-direction:column;gap:.7rem;}
+  .item{background:var(--card-bg);border:1px solid var(--border);border-radius:16px;display:flex;gap:.9rem;padding:.85rem;position:relative;transition:box-shadow .18s,transform .18s;overflow:hidden;}
+  .item:hover{box-shadow:var(--shadow);transform:translateY(-1px);}
+  .item.in-cart{border-color:var(--gold);box-shadow:0 0 0 1.5px var(--gold) inset;}
+  .item-img{width:78px;height:78px;border-radius:12px;flex-shrink:0;background:linear-gradient(135deg,#EFE6D2,#D8C79F);display:flex;align-items:center;justify-content:center;font-size:2rem;filter:drop-shadow(0 2px 4px rgba(26,18,9,.1));}
+  .item-body{flex:1;min-width:0;display:flex;flex-direction:column;}
+  .item-name{font-family:'Playfair Display',serif;font-size:1.02rem;font-weight:600;color:var(--dark);line-height:1.2;}
+  .item-name mark{background:var(--gold-light);color:var(--dark);border-radius:3px;padding:0 1px;}
+  .item-desc{font-size:.78rem;color:var(--muted);margin-top:.2rem;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .item-foot{display:flex;align-items:center;justify-content:space-between;margin-top:.55rem;gap:.5rem;}
+  .item-price{font-weight:700;font-size:1.02rem;color:var(--rust);white-space:nowrap;}
+  .item-cat-tag{font-size:.68rem;color:var(--muted);font-weight:500;margin-top:.15rem;}
+  .add-btn{background:var(--dark);color:var(--cream);border:none;border-radius:10px;padding:.45rem .85rem;font-family:inherit;font-size:.82rem;font-weight:600;cursor:pointer;transition:background .18s,transform .1s;white-space:nowrap;}
+  .add-btn:hover{background:var(--gold);color:var(--dark);}
+  .add-btn:active{transform:scale(.94);}
+  .qty{display:flex;align-items:center;gap:.5rem;background:var(--cream);border:1.5px solid var(--border-2);border-radius:10px;padding:.2rem;}
+  .qty button{width:30px;height:30px;border:none;background:var(--dark);color:var(--cream);border-radius:7px;font-size:1.05rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .18s;}
+  .qty button:hover{background:var(--gold);color:var(--dark);}
+  .qty span{font-weight:700;min-width:20px;text-align:center;font-size:.95rem;}
+  .badge{position:absolute;top:.55rem;right:.55rem;background:var(--gold);color:var(--dark);font-size:.62rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:.18rem .48rem;border-radius:5px;box-shadow:var(--shadow-sm);}
+
+  .empty-state{text-align:center;color:var(--muted);padding:3rem 1rem;}
+  .empty-state .big{font-size:3rem;margin-bottom:.6rem;}
+  .empty-state h3{font-family:'Playfair Display',serif;color:var(--dark);font-size:1.2rem;margin-bottom:.3rem;}
+  .search-meta{font-size:.8rem;color:var(--muted);margin:-.3rem 0 .9rem;}
+
+  /* ---------- CART FAB ---------- */
+  .fab{position:fixed;bottom:1.1rem;left:50%;transform:translateX(-50%);background:var(--dark);color:var(--cream);border:none;border-radius:100px;
+    padding:.95rem 1.4rem;font-family:inherit;font-size:.98rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:.8rem;
+    box-shadow:var(--shadow-lg);transition:transform .2s,background .2s,opacity .2s;z-index:100;min-width:min(340px,88vw);justify-content:space-between;}
+  .fab:hover{background:var(--gold);color:var(--dark);}
+  .fab.hidden{opacity:0;pointer-events:none;transform:translateX(-50%) translateY(120%);}
+  .fab .fab-left{display:flex;align-items:center;gap:.6rem;}
+  .fab .count{background:var(--gold);color:var(--dark);border-radius:100px;min-width:24px;height:24px;padding:0 .4rem;font-size:.82rem;font-weight:800;display:flex;align-items:center;justify-content:center;}
+  .fab.hidden .count,.fab:hover .count{background:var(--dark);color:var(--gold);}
+  .fab .fab-total{font-weight:800;}
+
+  /* ---------- MODAL / OVERLAY ---------- */
+  .overlay{position:fixed;inset:0;background:rgba(26,18,9,.62);z-index:200;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(2px);}
+  .overlay.open{display:flex;}
+  .sheet{background:var(--cream);border-radius:26px 26px 0 0;width:100%;max-width:560px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden;animation:slideUp .32s cubic-bezier(.2,.8,.2,1);}
+  @keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+  .sheet-grip{width:40px;height:4px;background:var(--border-2);border-radius:100px;margin:.6rem auto .2rem;flex-shrink:0;}
+  .sheet-head{padding:.6rem 1.4rem 1rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+  .sheet-head h2{font-family:'Playfair Display',serif;font-size:1.35rem;}
+  .x-btn{background:var(--border);border:none;border-radius:50%;width:36px;height:36px;font-size:1.05rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;}
+  .x-btn:hover{background:var(--dark);color:var(--cream);}
+  .sheet-body{overflow-y:auto;flex:1;padding:1rem 1.4rem;}
+
+  .cart-line{display:flex;align-items:center;gap:.8rem;padding:.7rem 0;border-bottom:1px solid var(--border);}
+  .cart-line .ce{font-size:1.35rem;}
+  .cart-line .cn{flex:1;min-width:0;font-weight:500;font-size:.92rem;line-height:1.2;}
+  .cart-line .cn small{display:block;color:var(--muted);font-weight:400;font-size:.78rem;}
+  .mini-qty{display:flex;align-items:center;gap:.4rem;}
+  .mini-qty button{width:26px;height:26px;border:none;background:var(--cream-2);color:var(--dark);border-radius:6px;font-size:.95rem;cursor:pointer;}
+  .mini-qty button:hover{background:var(--gold);}
+  .mini-qty span{min-width:18px;text-align:center;font-weight:700;font-size:.88rem;}
+  .cart-line .cp{font-weight:700;color:var(--rust);min-width:74px;text-align:right;font-size:.92rem;}
+
+  .field{margin-top:1rem;}
+  .field label{display:block;font-size:.8rem;color:var(--muted);font-weight:600;margin-bottom:.35rem;}
+  .field label .req{color:var(--rust);}
+  .field input,.field textarea{width:100%;padding:.7rem .9rem;border:1.5px solid var(--border-2);border-radius:10px;font-family:inherit;font-size:.92rem;background:var(--card-bg);color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s;resize:none;}
+  .field input:focus,.field textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,150,42,.13);}
+  .field.two{display:flex;gap:.7rem;}
+  .field.two>div{flex:1;}
+
+  .sheet-foot{padding:1rem 1.4rem 1.3rem;border-top:2px solid var(--border);background:var(--card-bg);flex-shrink:0;}
+  .foot-total{display:flex;justify-content:space-between;align-items:baseline;font-size:1.05rem;font-weight:700;margin-bottom:.8rem;}
+  .foot-total .tv{color:var(--rust);font-size:1.4rem;}
+  .cta{width:100%;background:var(--gold);color:var(--dark);border:none;border-radius:13px;padding:1rem;font-family:inherit;font-size:1rem;font-weight:800;letter-spacing:.01em;cursor:pointer;transition:background .2s,transform .1s;display:flex;align-items:center;justify-content:center;gap:.5rem;}
+  .cta:hover{background:var(--gold-light);}
+  .cta:active{transform:scale(.98);}
+  .cta:disabled{background:var(--border-2);color:var(--muted);cursor:not-allowed;}
+
+  /* ---------- TRACKING ---------- */
+  .track{padding:1.6rem 1.4rem 2rem;text-align:center;}
+  .track .num{font-size:.8rem;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;font-weight:600;}
+  .track .num b{color:var(--gold);font-size:1.5rem;display:block;margin-top:.2rem;letter-spacing:.06em;}
+  .stepper{display:flex;align-items:flex-start;justify-content:space-between;position:relative;margin:1.8rem .5rem 1.4rem;}
+  .stepper::before{content:'';position:absolute;top:26px;left:12%;right:12%;height:3px;background:var(--border-2);border-radius:3px;z-index:0;}
+  .stepper .prog{content:'';position:absolute;top:26px;left:12%;height:3px;background:var(--green);border-radius:3px;z-index:1;transition:width .5s ease;}
+  .step{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:.5rem;width:33%;}
+  .step .ic{width:54px;height:54px;border-radius:50%;background:var(--card-bg);border:3px solid var(--border-2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;transition:all .35s;color:var(--muted);}
+  .step .lbl{font-size:.78rem;font-weight:600;color:var(--muted);transition:color .3s;}
+  .step.done .ic{background:var(--green);border-color:var(--green);}
+  .step.done .lbl{color:var(--green);}
+  .step.current .ic{background:var(--gold);border-color:var(--gold);color:var(--dark);animation:pulse 1.6s infinite;}
+  .step.current .lbl{color:var(--dark);}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(200,150,42,.5);}70%{box-shadow:0 0 0 14px rgba(200,150,42,0);}100%{box-shadow:0 0 0 0 rgba(200,150,42,0);}}
+  .track-msg{background:var(--card-bg);border:1px solid var(--border);border-radius:14px;padding:1rem;font-size:.9rem;color:var(--text);line-height:1.45;}
+  .track-msg b{color:var(--dark);}
+  .track-live{display:inline-flex;align-items:center;gap:.4rem;font-size:.75rem;color:var(--green);font-weight:600;margin-top:.7rem;}
+  .track-live .dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:blink 1.2s infinite;}
+  @keyframes blink{50%{opacity:.25;}}
+  .notify-btn{margin-top:1rem;background:transparent;border:1.5px solid var(--border-2);color:var(--dark);border-radius:12px;padding:.75rem;width:100%;font-family:inherit;font-weight:600;font-size:.88rem;cursor:pointer;transition:all .2s;}
+  .notify-btn:hover{border-color:var(--gold);background:var(--card-bg);}
+  .notify-btn.on{border-color:var(--green);color:var(--green);}
+
+  .spin{display:inline-block;width:17px;height:17px;border:2px solid rgba(26,18,9,.3);border-top-color:var(--dark);border-radius:50%;animation:spin .7s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* ---------- TOAST ---------- */
+  .toast{position:fixed;top:1rem;left:50%;transform:translate(-50%,-90px);background:var(--dark);color:var(--cream);padding:.8rem 1.3rem;border-radius:12px;font-size:.9rem;z-index:999;opacity:0;transition:all .3s;box-shadow:var(--shadow-lg);max-width:90vw;text-align:center;}
+  .toast.show{transform:translate(-50%,0);opacity:1;}
+
+  @media(max-width:380px){.item-img{width:66px;height:66px;font-size:1.7rem;}}
 </style>
-  <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#1A1209">
 </head>
 <body>
 
 <header>
-  <div class="header-ornament">✦ Bem-vindo ao ✦</div>
-  <h1>Bella Vista</h1>
-  <p>Culinária Italiana Contemporânea</p>
+  <div class="brand-mark">✦ Lanchonete &amp; Restaurante ✦</div>
+  <h1>Santa Fé</h1>
+  <div class="info-row">
+    <span class="info-pill">📍 Vila Olímpia</span>
+    <span class="info-pill">⏱ <b>30–45 min</b></span>
+    <span class="info-pill">Pedido mín. <b>R$ 10</b></span>
+  </div>
 </header>
 
-<div class="name-banner">
-  <div class="name-row">
-    <label>👤 Seu nome:</label>
-    <input type="text" id="clientName" placeholder="Ex: João Silva" maxlength="40">
-  </div>
-  <div class="name-row">
-    <label>🪑 Mesa:</label>
-    <input type="number" id="tableNum" placeholder="Número da mesa" min="1" max="99" style="max-width:180px">
+<div class="searchbar">
+  <div class="search-inner">
+    <span class="lupa">🔍</span>
+    <input id="searchInput" type="search" autocomplete="off" placeholder="Buscar no cardápio… (ex: picanha, tapioca, suco)">
+    <button class="search-clear" id="searchClear" aria-label="Limpar" onclick="clearSearch()">✕</button>
   </div>
 </div>
 
-<nav class="categories">
-  <button class="cat-btn active" onclick="filterCategory('all')">Todos</button>
-  <button class="cat-btn" onclick="filterCategory('entradas')">🥗 Entradas</button>
-  <button class="cat-btn" onclick="filterCategory('massas')">🍝 Massas</button>
-  <button class="cat-btn" onclick="filterCategory('carnes')">🥩 Carnes</button>
-  <button class="cat-btn" onclick="filterCategory('bebidas')">🍷 Bebidas</button>
-  <button class="cat-btn" onclick="filterCategory('sobremesas')">🍮 Sobremesas</button>
-</nav>
+<main id="app"></main>
 
-<main class="menu-container" id="menuContainer"></main>
-
-<button class="cart-fab hidden" id="cartFab" onclick="openCart()">
-  🛒 Ver Carrinho
-  <span class="cart-count" id="cartCount">0</span>
+<button class="fab hidden" id="fab" onclick="openCart()">
+  <span class="fab-left">🛒 <span>Ver pedido</span><span class="count" id="fabCount">0</span></span>
+  <span class="fab-total" id="fabTotal">R$ 0,00</span>
 </button>
 
-<div class="overlay" id="overlay" onclick="closeOnOverlay(event)">
-  <div class="cart-modal" id="cartModal">
-    <div id="cartContent">
-      <div class="cart-header">
-        <h2>🛒 Seu Pedido</h2>
-        <button class="close-btn" onclick="closeCart()">✕</button>
-      </div>
-      <div class="cart-items" id="cartItems"></div>
-      <div class="obs-wrap">
-        <label>Observações (opcional)</label>
-        <textarea id="observations" rows="2" placeholder="Sem cebola, sem glúten, etc..."></textarea>
-      </div>
-      <div class="cart-footer">
-        <div class="cart-total">
-          <span>Total</span>
-          <span class="total-val" id="cartTotal">R$ 0,00</span>
+<div class="overlay" id="overlay" onclick="overlayClick(event)">
+  <div class="sheet" id="sheet">
+    <div class="sheet-grip"></div>
+    <!-- CART / CHECKOUT -->
+    <div id="cartView">
+      <div class="sheet-head"><h2>🛒 Seu pedido</h2><button class="x-btn" onclick="closeCart()">✕</button></div>
+      <div class="sheet-body">
+        <div id="cartLines"></div>
+        <div class="field two">
+          <div>
+            <label>Seu nome <span class="req">*</span></label>
+            <input id="clientName" maxlength="40" placeholder="Ex: João Silva">
+          </div>
+          <div>
+            <label>Mesa</label>
+            <input id="tableNum" type="number" min="1" max="199" placeholder="Nº">
+          </div>
         </div>
-        <button class="confirm-btn" id="confirmBtn" onclick="submitOrder()">
-          Enviar Pedido para a Cozinha →
-        </button>
+        <div class="field">
+          <label>Observações</label>
+          <textarea id="obs" rows="2" placeholder="Sem cebola, ponto da carne, troco para R$ 50…"></textarea>
+        </div>
+      </div>
+      <div class="sheet-foot">
+        <div class="foot-total"><span>Total</span><span class="tv" id="cartTotal">R$ 0,00</span></div>
+        <button class="cta" id="confirmBtn" onclick="submitOrder()">Enviar pedido para a cozinha →</button>
       </div>
     </div>
-    <div class="success-screen" id="successScreen">
-      <div class="success-icon">✓</div>
-      <h3>Pedido Enviado!</h3>
-      <div class="order-num" id="orderNum">#001</div>
-      <p>A cozinha já recebeu seu pedido.<br>Aguarde, estamos preparando tudo!</p>
-      <button class="confirm-btn" style="margin-top:1rem" onclick="closeCart(); resetOrder()">
-        Fazer Novo Pedido
-      </button>
+    <!-- TRACKING -->
+    <div id="trackView" style="display:none">
+      <div class="sheet-head"><h2>👨‍🍳 Acompanhe seu pedido</h2><button class="x-btn" onclick="closeCart()">✕</button></div>
+      <div class="track">
+        <div class="num">Pedido <b id="trackNum">#000</b></div>
+        <div class="stepper">
+          <div class="prog" id="trackProg" style="width:0"></div>
+          <div class="step" id="step-1"><div class="ic">🧾</div><div class="lbl">Recebido</div></div>
+          <div class="step" id="step-2"><div class="ic">👨‍🍳</div><div class="lbl">Em preparo</div></div>
+          <div class="step" id="step-3"><div class="ic">✅</div><div class="lbl">Pronto</div></div>
+        </div>
+        <div class="track-msg" id="trackMsg">A cozinha recebeu seu pedido e vai começar já já. 🍳</div>
+        <div class="track-live" id="trackLive"><span class="dot"></span> Acompanhando em tempo real</div>
+        <button class="notify-btn" id="notifyBtn" onclick="enablePush()">🔔 Avisar no meu celular quando ficar pronto</button>
+        <button class="cta" style="margin-top:1rem" onclick="newOrder()">Fazer novo pedido</button>
+      </div>
     </div>
   </div>
 </div>
@@ -706,465 +285,629 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// ============================================================
-// CONFIGURAÇÃO SUPABASE — substitua pelos seus dados
-// ============================================================
-const SUPABASE_URL = 'https://iejbicssmxjgrxitpcpf.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllamJpY3NzbXhqZ3J4aXRwY3BmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3ODMyOTUsImV4cCI6MjA5MzM1OTI5NX0.NBXgFNEKzqpqMv1CtNzyRyw4bntflyH1sVw9-Ie6S_w';
-
-// Envia pedido via fetch puro para a API REST do Supabase — sem SDK
+// ===== CONFIG (Supabase / Push) =====
+const SUPABASE_URL='https://iejbicssmxjgrxitpcpf.supabase.co';
+const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllamJpY3NzbXhqZ3J4aXRwY3BmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3ODMyOTUsImV4cCI6MjA5MzM1OTI5NX0.NBXgFNEKzqpqMv1CtNzyRyw4bntflyH1sVw9-Ie6S_w';
+const VAPID_PUBLIC_KEY='BDzD3jLwiAtEYJcfEx2vtlkrYTOYH1AT1J7scM-SomEBwlWvACgZ78eHE78sE0GCG48OibE702UIGlSfUxA_Gtk';
+const EDGE_FUNCTION_URL='https://iejbicssmxjgrxitpcpf.supabase.co/functions/v1/send-push';
 const useSupabase = !SUPABASE_URL.includes('SEU_PROJETO');
 
-async function sbInsert(row) {
-  const res = await fetch(SUPABASE_URL.replace(/\/$/, '') + '/rest/v1/orders', {
-    method: 'POST',
-    headers: {
-      'apikey': SUPABASE_ANON_KEY,
-      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': 'return=minimal'
-    },
-    body: JSON.stringify(row)
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.message || err.hint || 'HTTP ' + res.status);
-  }
-}
-
-// ============================================================
-// CARDÁPIO — Edite aqui os pratos do restaurante
-// ============================================================
 const menu = [
-  // ENTRADAS
-  // ✅ Para usar foto real: adicione imageUrl com o link da imagem.
-  //    Se não tiver foto, deixe sem imageUrl e o emoji será exibido.
-  {
-    id: 1, category: 'entradas', badge: 'Popular',
-    name: 'Bruschetta Clássica',
-    desc: 'Pão tostado com tomate fresco, alho, manjericão e azeite extra virgem',
-    price: 28.90, emoji: '🍅',
-    // imageUrl: 'fotos/bruschetta.jpg'   ← descomente e adicione o link/caminho da foto
-  },
-  {
-    id: 2, category: 'entradas',
-    name: 'Carpaccio di Manzo',
-    desc: 'Lâminas de filé mignon cru, rúcula, parmesão e alcaparras',
-    price: 48.90, emoji: '🥩'
-  },
-  {
-    id: 3, category: 'entradas',
-    name: 'Burrata com Presunto',
-    desc: 'Burrata cremosa, presunto de Parma, mel trufado e nozes',
-    price: 54.90, emoji: '🧀'
-  },
-
-  // MASSAS
-  {
-    id: 4, category: 'massas', badge: 'Chef',
-    name: 'Tagliatelle al Ragù',
-    desc: 'Massa fresca artesanal com ragù de costela bovina cozida 6 horas',
-    price: 72.90, emoji: '🍝'
-  },
-  {
-    id: 5, category: 'massas',
-    name: 'Risotto ai Funghi',
-    desc: 'Arroz arbóreo, mix de cogumelos frescos, parmesão e manteiga',
-    price: 68.90, emoji: '🍄'
-  },
-  {
-    id: 6, category: 'massas', badge: 'Novo',
-    name: 'Gnocchi di Zucca',
-    desc: 'Nhoque de abóbora ao molho de gorgonzola e nozes caramelizadas',
-    price: 62.90, emoji: '🎃'
-  },
-
-  // CARNES
-  {
-    id: 7, category: 'carnes',
-    name: 'Saltimbocca alla Romana',
-    desc: 'Escalope de vitela, presunto de Parma, sálvia e manteiga de limão',
-    price: 98.90, emoji: '🥩'
-  },
-  {
-    id: 8, category: 'carnes', badge: 'Especial',
-    name: 'Bistecca Fiorentina',
-    desc: 'Costeleta de boi ancho 400g, ervas da Provence e legumes grelhados',
-    price: 148.90, emoji: '🔥'
-  },
-
-  // BEBIDAS
-  {
-    id: 9, category: 'bebidas',
-    name: 'Água Mineral (500ml)',
-    desc: 'Com ou sem gás',
-    price: 8.00, emoji: '💧'
-  },
-  {
-    id: 10, category: 'bebidas',
-    name: 'Vinho Chianti Classico',
-    desc: 'Taça de 150ml — Sangiovese, Toscana, Itália',
-    price: 34.90, emoji: '🍷'
-  },
-  {
-    id: 11, category: 'bebidas', badge: 'Popular',
-    name: 'Spritz Aperol',
-    desc: 'Aperol, Prosecco, água com gás e laranja',
-    price: 28.90, emoji: '🍊'
-  },
-  {
-    id: 12, category: 'bebidas',
-    name: 'Suco Natural',
-    desc: 'Laranja, limão ou maracujá (300ml)',
-    price: 14.90, emoji: '🍋'
-  },
-
-  // SOBREMESAS
-  {
-    id: 13, category: 'sobremesas', badge: 'Must Try',
-    name: 'Tiramisù Originale',
-    desc: 'Receita da Nonna: mascarpone, savoiardi, café espresso e cacau',
-    price: 34.90, emoji: '☕'
-  },
-  {
-    id: 14, category: 'sobremesas',
-    name: 'Panna Cotta',
-    desc: 'Panna cotta de baunilha com calda de frutas vermelhas',
-    price: 28.90, emoji: '🍮'
-  },
+  { id:1, category:"cafe", name:"Chá Quente", desc:"", price:4.00, emoji:"🍵" },
+  { id:2, category:"cafe", name:"Café Puro Coador", desc:"", price:4.50, emoji:"☕" },
+  { id:3, category:"cafe", name:"Café com Leite Coador", desc:"", price:4.50, emoji:"☕" },
+  { id:4, category:"cafe", name:"Média Coador", desc:"", price:6.00, emoji:"☕" },
+  { id:5, category:"cafe", name:"Café Expresso", desc:"", price:6.00, emoji:"☕" },
+  { id:6, category:"cafe", name:"Média Expresso", desc:"", price:8.00, emoji:"☕" },
+  { id:7, category:"cafe", name:"Capuccino", desc:"", price:8.00, emoji:"☕" },
+  { id:8, category:"cafe", name:"Chocolate Quente", desc:"", price:8.00, emoji:"🍫" },
+  { id:9, category:"cafe", name:"Chocolate Gelado Batido", desc:"", price:8.50, emoji:"🥤" },
+  { id:10, category:"cafe", name:"Toddy Gelado Batido", desc:"", price:8.50, emoji:"🥤" },
+  { id:11, category:"paes", name:"Pão Simples", desc:"", price:2.25, emoji:"🥖" },
+  { id:12, category:"paes", name:"Pão com Manteiga (frio)", desc:"", price:4.90, emoji:"🥖" },
+  { id:13, category:"paes", name:"Pão com Manteiga (chapa)", desc:"", price:4.90, emoji:"🥖" },
+  { id:14, category:"paes", name:"Pão na Chapa com Requeijão", desc:"Na saída ou queimado", price:8.90, emoji:"🥖" },
+  { id:15, category:"paes", name:"Pão Integral com Manteiga (frio)", desc:"", price:5.00, emoji:"🥖" },
+  { id:16, category:"paes", name:"Pão Integral com Manteiga (chapa)", desc:"", price:5.00, emoji:"🥖" },
+  { id:17, category:"paes", name:"Pão Integral na Chapa com Requeijão (saída)", desc:"", price:10.50, emoji:"🥖" },
+  { id:18, category:"paes", name:"Pão Integral na Chapa com Requeijão (queimado)", desc:"", price:8.00, emoji:"🥖" },
+  { id:19, category:"paes", name:"Pão de Forma Integral com Manteiga (chapa)", desc:"", price:5.00, emoji:"🥖" },
+  { id:20, category:"paes", name:"Pão de Forma Integral com Requeijão (queimado)", desc:"", price:7.50, emoji:"🥖" },
+  { id:21, category:"paes", name:"Pão de Forma Integral com Requeijão (saída)", desc:"", price:8.00, emoji:"🥖" },
+  { id:22, category:"paes", name:"Pão na Chapa com Nutella", desc:"", price:11.00, emoji:"🍫" },
+  { id:23, category:"paes", name:"Pão de Queijo", desc:"", price:6.00, emoji:"🧀" },
+  { id:24, category:"paes", name:"Pão de Queijo Integral", desc:"", price:6.00, emoji:"🧀" },
+  { id:25, category:"paes", name:"Pão de Queijo com Requeijão", desc:"Na saída ou queimado", price:9.00, emoji:"🧀" },
+  { id:26, category:"paes", name:"Pão de Queijo Integral com Requeijão (saída)", desc:"", price:9.00, emoji:"🧀" },
+  { id:27, category:"paes", name:"Pão de Queijo com Goiabada", desc:"", price:8.00, emoji:"🧀" },
+  { id:28, category:"paes", name:"Pão de Queijo com Goiaba", desc:"", price:7.50, emoji:"🧀" },
+  { id:29, category:"paes", name:"Pão de Queijo com Nutella", desc:"", price:12.00, emoji:"🍫" },
+  { id:30, category:"paes", name:"Pão de Queijo Integral com Nutella", desc:"", price:11.50, emoji:"🍫" },
+  { id:31, category:"salgados", name:"Coxinha (sem catupiry)", desc:"", price:9.00, emoji:"🥟" },
+  { id:32, category:"salgados", name:"Coxinha com Catupiry", desc:"", price:9.50, emoji:"🥟" },
+  { id:33, category:"salgados", name:"Empada de Frango", desc:"", price:9.00, emoji:"🥧" },
+  { id:34, category:"salgados", name:"Empada de Palmito", desc:"", price:9.00, emoji:"🥧" },
+  { id:35, category:"salgados", name:"Pão de Batata com Catupiry", desc:"", price:9.00, emoji:"🥟" },
+  { id:36, category:"salgados", name:"Pão de Batata com Frango", desc:"", price:8.00, emoji:"🥟" },
+  { id:37, category:"salgados", name:"Pão de Batata com Calabresa", desc:"", price:8.00, emoji:"🥟" },
+  { id:38, category:"salgados", name:"Bauruzinho", desc:"", price:9.90, emoji:"🥪" },
+  { id:39, category:"salgados", name:"Baguete de Calabresa com Vinagrete", desc:"", price:9.00, emoji:"🥖" },
+  { id:40, category:"salgados", name:"Esfirra de Carne", desc:"", price:9.00, emoji:"🥟" },
+  { id:41, category:"salgados", name:"Esfirra de Frango", desc:"", price:9.00, emoji:"🥟" },
+  { id:42, category:"salgados", name:"Esfirra de Calabresa", desc:"", price:9.00, emoji:"🥟" },
+  { id:43, category:"salgados", name:"Croissant de Queijo", desc:"", price:9.00, emoji:"🥐" },
+  { id:44, category:"salgados", name:"Croissant Misto", desc:"", price:9.00, emoji:"🥐" },
+  { id:45, category:"salgados", name:"Croissant Frango com Catupiry", desc:"", price:9.90, emoji:"🥐" },
+  { id:46, category:"salgados", name:"Croissant Peito de Peru com Queijo Minas", desc:"", price:9.90, emoji:"🥐" },
+  { id:47, category:"tapiocas", name:"Tapioca de Manteiga", desc:"", price:12.00, emoji:"🫓" },
+  { id:48, category:"tapiocas", name:"Tapioca Ovo Mexido com Requeijão", desc:"", price:12.00, emoji:"🫓" },
+  { id:49, category:"tapiocas", name:"Tapioca Mista", desc:"Queijo e presunto", price:13.00, emoji:"🫓" },
+  { id:50, category:"tapiocas", name:"Tapioca Light", desc:"Peito de peru e queijo minas", price:18.00, emoji:"🫓" },
+  { id:51, category:"tapiocas", name:"Tapioca Frango com Catupiry", desc:"", price:18.00, emoji:"🫓" },
+  { id:52, category:"tapiocas", name:"Tapioca Banana e Canela", desc:"", price:12.00, emoji:"🍌" },
+  { id:53, category:"tapiocas", name:"Tapioca Coco com Leite Condensado", desc:"", price:13.00, emoji:"🥥" },
+  { id:54, category:"tapiocas", name:"Tapioca Banana e Chocolate", desc:"", price:13.00, emoji:"🍌" },
+  { id:55, category:"tapiocas", badge:"Popular", name:"Tapioca de Nutella com Morango", desc:"", price:20.00, emoji:"🍓" },
+  { id:56, category:"lanches", name:"Natural de Queijo Minas (frio)", desc:"Pão francês, de forma integral ou francês integral", price:19.90, emoji:"🥪" },
+  { id:57, category:"lanches", name:"Natural de Peito de Peru (frio)", desc:"Pão francês, de forma integral ou francês integral", price:19.90, emoji:"🥪" },
+  { id:58, category:"lanches", name:"Natural Peito de Peru com Queijo Minas (frio)", desc:"Pão francês, de forma integral ou francês integral", price:22.90, emoji:"🥪" },
+  { id:59, category:"lanches", name:"Natural Filé de Frango com Queijo Branco", desc:"Pão francês, de forma integral ou francês integral", price:32.00, emoji:"🥪" },
+  { id:60, category:"lanches", name:"Natural Filé Mignon com Queijo Branco", desc:"Pão francês, de forma integral ou francês integral", price:46.90, emoji:"🥪" },
+  { id:61, category:"lanches", name:"Ovo Mexido", desc:"2 ovos", price:7.90, emoji:"🍳" },
+  { id:62, category:"lanches", name:"Pão Egg", desc:"2 ovos", price:10.00, emoji:"🍳" },
+  { id:63, category:"lanches", name:"Queijo Quente", desc:"Quente ou frio", price:15.90, emoji:"🧀" },
+  { id:64, category:"lanches", name:"Misto Quente", desc:"", price:15.90, emoji:"🥪" },
+  { id:65, category:"lanches", name:"Bauru", desc:"", price:16.90, emoji:"🥪" },
+  { id:66, category:"lanches", name:"Bauru Especial", desc:"", price:19.90, emoji:"🥪" },
+  { id:67, category:"lanches", name:"Mortadela", desc:"Ouro Perdigão", price:13.90, emoji:"🥪" },
+  { id:68, category:"lanches", name:"Mortadela com Queijo", desc:"Ouro Perdigão", price:14.90, emoji:"🥪" },
+  { id:69, category:"lanches", name:"Americano", desc:"", price:19.90, emoji:"🥪" },
+  { id:70, category:"lanches", name:"Provolone", desc:"", price:24.00, emoji:"🧀" },
+  { id:71, category:"lanches", name:"Provolone com Salame", desc:"", price:26.00, emoji:"🧀" },
+  { id:72, category:"lanches", name:"Salame", desc:"", price:23.00, emoji:"🥪" },
+  { id:73, category:"lanches", name:"Salame com Queijo", desc:"", price:26.00, emoji:"🥪" },
+  { id:74, category:"lanches", name:"Lanche de Calabresa", desc:"Queijo ou vinagrete — acompanha fritas e maionese caseira", price:25.90, emoji:"🌭" },
+  { id:75, category:"lanches", name:"Lanche de Churrasco", desc:"Queijo ou vinagrete — acompanha fritas e maionese caseira", price:31.90, emoji:"🥩" },
+  { id:76, category:"lanches", name:"Lanche de Filé de Frango", desc:"Queijo ou vinagrete — acompanha fritas e maionese caseira", price:26.90, emoji:"🍗" },
+  { id:77, category:"lanches", name:"Lanche de Filé Mignon", desc:"Queijo ou vinagrete — acompanha fritas e maionese caseira", price:37.90, emoji:"🥩" },
+  { id:78, category:"lanches", badge:"Chef", name:"Lanche de Picanha", desc:"Queijo ou vinagrete — acompanha fritas e maionese caseira", price:39.90, emoji:"🥩" },
+  { id:79, category:"burgers", badge:"Da Casa", name:"Santa Fé 1", desc:"Hambúrguer artesanal 150g, bacon, salada e queijo prato — acompanha fritas", price:39.90, emoji:"🍔" },
+  { id:80, category:"burgers", badge:"Da Casa", name:"Santa Fé 2", desc:"2 hambúrgueres artesanais 150g, bacon, salada e queijo prato — acompanha fritas", price:50.90, emoji:"🍔" },
+  { id:81, category:"burgers", name:"Santa Fé Burguer", desc:"Hambúrguer artesanal 150g e queijo prato — acompanha fritas", price:33.90, emoji:"🍔" },
+  { id:82, category:"burgers", name:"Santa Fé Salada", desc:"Hambúrguer artesanal 150g, alface, tomate e queijo prato — acompanha fritas", price:35.00, emoji:"🍔" },
+  { id:83, category:"burgers", badge:"Completo", name:"Santa Fé Tudo", desc:"Hambúrguer 150g, bacon, salada, ovo, presunto e queijo prato — acompanha fritas", price:46.90, emoji:"🍔" },
+  { id:84, category:"burgers", badge:"Da Casa", name:"Beirute Santa Fé", desc:"Picanha, queijo, bacon e salada", price:50.90, emoji:"🥙" },
+  { id:85, category:"burgers", name:"Beirute Simples", desc:"Presunto, queijo, alface e tomate", price:28.00, emoji:"🥙" },
+  { id:86, category:"burgers", name:"Beirute Americano", desc:"Presunto, queijo, alface, tomate e ovo", price:36.90, emoji:"🥙" },
+  { id:87, category:"burgers", name:"Beirute Filé de Frango", desc:"Queijo, alface e tomate", price:38.90, emoji:"🥙" },
+  { id:88, category:"burgers", name:"Beirute Calabresa", desc:"Queijo, alface e tomate", price:34.90, emoji:"🥙" },
+  { id:89, category:"burgers", name:"Beirute Contra Filé", desc:"Queijo, alface e tomate", price:43.90, emoji:"🥙" },
+  { id:90, category:"burgers", name:"Beirute Light", desc:"Queijo branco, alface, tomate e cenoura", price:34.90, emoji:"🥙" },
+  { id:91, category:"burgers", name:"Beirute Filé Mignon", desc:"Queijo, alface e tomate", price:50.90, emoji:"🥙" },
+  { id:92, category:"omeletes", name:"Omelete Mista", desc:"Queijo e presunto — sem acompanhamento", price:21.90, emoji:"🍳" },
+  { id:93, category:"omeletes", name:"Omelete Olímpia", desc:"Queijo prato — sem acompanhamento", price:23.90, emoji:"🍳" },
+  { id:94, category:"omeletes", name:"Omelete Light", desc:"Queijo branco e peito de peru — sem acompanhamento", price:25.90, emoji:"🍳" },
+  { id:95, category:"omeletes", name:"Omelete Completa", desc:"Queijo, presunto, vinagrete e bacon — sem acompanhamento", price:25.90, emoji:"🍳" },
+  { id:96, category:"pratos", badge:"Chef", name:"Picanha à Brasileira Grelhada", desc:"Arroz, feijão, fritas, farofa e vinagrete", price:59.90, emoji:"🥩" },
+  { id:97, category:"pratos", name:"Bife Ancho Grelhado", desc:"Arroz, feijão, fritas, farofa e vinagrete", price:48.90, emoji:"🥩" },
+  { id:98, category:"pratos", name:"Filé Mignon Grelhado", desc:"Arroz, feijão, fritas ou legumes", price:59.90, emoji:"🥩" },
+  { id:99, category:"pratos", name:"Contra Filé Grelhado", desc:"Arroz, feijão, fritas ou salada", price:39.90, emoji:"🥩" },
+  { id:100, category:"pratos", name:"Fraldinha Grelhada", desc:"Arroz, feijão, farofa, fritas ou salada", price:39.90, emoji:"🥩" },
+  { id:101, category:"pratos", name:"Salmão Grelhado", desc:"Arroz, feijão, purê ou legumes", price:59.90, emoji:"🐟" },
+  { id:102, category:"pratos", name:"Tilápia ao Molho de Ervas", desc:"Arroz com brócolis e batata sauté ou purê", price:45.90, emoji:"🐟" },
+  { id:103, category:"pratos", name:"Filé de Frango Grelhado", desc:"Arroz, feijão, fritas ou salada", price:32.90, emoji:"🍗" },
+  { id:104, category:"pratos", name:"Bisteca Grelhada", desc:"Arroz, feijão, fritas ou salada", price:30.00, emoji:"🍖" },
+  { id:105, category:"pratos", name:"Picanha Suína Grelhada", desc:"Arroz, feijão, farofa, fritas ou salada", price:33.90, emoji:"🍖" },
+  { id:106, category:"pratos", name:"Frango Grelhado", desc:"Arroz, feijão, fritas ou salada", price:32.90, emoji:"🍗" },
+  { id:107, category:"pratos", name:"Prato de Hambúrguer", desc:"2 hambúrgueres, arroz, feijão, farofa, fritas ou salada", price:39.90, emoji:"🍔" },
+  { id:108, category:"pratos", name:"Filé de Frango à Pizzaiolo", desc:"Arroz, feijão e fritas", price:39.90, emoji:"🍗" },
+  { id:109, category:"pratos", badge:"Serve 2", name:"Picanha Família", desc:"Serve 2 pessoas — arroz, feijão, fritas, farofa e vinagrete", price:128.90, emoji:"🥩" },
+  { id:110, category:"pratos", name:"Filé de Frango à Milanesa", desc:"Arroz, feijão, fritas ou legumes", price:38.90, emoji:"🍗" },
+  { id:111, category:"pratos", name:"Contra Filé à Milanesa", desc:"Arroz, feijão, fritas ou legumes", price:46.90, emoji:"🥩" },
+  { id:112, category:"pratos", name:"Filé Mignon à Milanesa", desc:"Arroz, feijão, fritas ou legumes", price:65.90, emoji:"🥩" },
+  { id:113, category:"pratos", name:"Prato Omelete Mista", desc:"Queijo e presunto — arroz, feijão e fritas", price:34.90, emoji:"🍳" },
+  { id:114, category:"pratos", name:"Prato Omelete Olímpia", desc:"Queijo prato — arroz, feijão e fritas", price:34.90, emoji:"🍳" },
+  { id:115, category:"pratos", name:"Prato Omelete Light", desc:"Queijo branco e peito de peru — arroz, feijão e fritas", price:37.90, emoji:"🍳" },
+  { id:116, category:"pratos", name:"Prato Omelete Completa", desc:"Queijo, presunto, vinagrete e bacon — arroz, feijão e fritas", price:36.90, emoji:"🍳" },
+  { id:117, category:"guarnicoes", name:"Guarnição de Ovo", desc:"Unidade", price:3.00, emoji:"🍳" },
+  { id:118, category:"guarnicoes", name:"Guarnição de Salada", desc:"", price:8.90, emoji:"🥗" },
+  { id:119, category:"guarnicoes", name:"Guarnição de Arroz", desc:"", price:9.90, emoji:"🍚" },
+  { id:120, category:"guarnicoes", name:"Guarnição de Feijão", desc:"", price:9.90, emoji:"🫘" },
+  { id:121, category:"guarnicoes", name:"Guarnição Mini Fritas", desc:"", price:11.90, emoji:"🍟" },
+  { id:122, category:"guarnicoes", name:"Guarnição de Legumes", desc:"", price:9.90, emoji:"🥦" },
+  { id:123, category:"guarnicoes", name:"Guarnição de Purê", desc:"", price:9.90, emoji:"🥔" },
+  { id:124, category:"guarnicoes", name:"Guarnição Filé de Frango", desc:"", price:23.90, emoji:"🍗" },
+  { id:125, category:"guarnicoes", name:"Guarnição Filé de Frango à Milanesa", desc:"", price:26.00, emoji:"🍗" },
+  { id:126, category:"guarnicoes", name:"Guarnição Contra Filé", desc:"", price:28.90, emoji:"🥩" },
+  { id:127, category:"guarnicoes", name:"Guarnição Filé Mignon Grelhado", desc:"", price:46.90, emoji:"🥩" },
+  { id:128, category:"guarnicoes", name:"Guarnição de Picanha", desc:"", price:48.90, emoji:"🥩" },
+  { id:129, category:"guarnicoes", name:"Guarnição de Salmão", desc:"", price:42.90, emoji:"🐟" },
+  { id:130, category:"saladas", badge:"Da Casa", name:"Salada Santa Fé", desc:"Alface americana, tomate, cenoura, brócolis e mais", price:35.00, emoji:"🥗" },
+  { id:131, category:"saladas", name:"Salada Ceaser", desc:"Alface americana, tiras de frango, bacon, presunto e queijo", price:30.90, emoji:"🥗" },
+  { id:132, category:"saladas", name:"Salada Light com Filé de Frango", desc:"Alface, tomate, cenoura, azeitona, palmito e ovo de codorna", price:31.90, emoji:"🥗" },
+  { id:133, category:"saladas", name:"Salada Light com Contra Filé", desc:"Alface, tomate, cenoura, azeitona, palmito e ovo de codorna", price:39.90, emoji:"🥗" },
+  { id:134, category:"saladas", name:"Salada Light com Filé Mignon", desc:"Alface, tomate, cenoura, azeitona, palmito e ovo de codorna", price:55.90, emoji:"🥗" },
+  { id:135, category:"saladas", name:"Salada Light com Frango à Milanesa", desc:"Alface, tomate, cenoura, azeitona, palmito e ovo de codorna", price:37.90, emoji:"🥗" },
+  { id:136, category:"saladas", name:"Salada Light com Hambúrguer", desc:"Alface, tomate, cenoura, azeitona, palmito e ovo de codorna", price:32.00, emoji:"🥗" },
+  { id:137, category:"saladas", name:"Salada Light com Salmão", desc:"Alface, tomate, cenoura, azeitona, palmito e ovo de codorna", price:55.90, emoji:"🥗" },
+  { id:138, category:"porcoes", name:"Porção Costelinha Suína com Mandioca", desc:"", price:60.00, emoji:"🍖" },
+  { id:139, category:"porcoes", name:"Porção Frango à Passarinho", desc:"", price:39.90, emoji:"🍗" },
+  { id:140, category:"porcoes", badge:"Chef", name:"Porção Filé Mignon", desc:"", price:98.90, emoji:"🥩" },
+  { id:141, category:"porcoes", name:"Porção Provolone à Milanesa", desc:"", price:55.00, emoji:"🧀" },
+  { id:142, category:"porcoes", name:"Porção Iscas de Peixe", desc:"Linguado", price:50.00, emoji:"🐟" },
+  { id:143, category:"porcoes", name:"Porção Isca de Frango", desc:"", price:39.90, emoji:"🍗" },
+  { id:144, category:"porcoes", name:"Porção de Calabresa", desc:"", price:39.90, emoji:"🌭" },
+  { id:145, category:"porcoes", name:"Porção de Batata Frita", desc:"", price:35.00, emoji:"🍟" },
+  { id:146, category:"porcoes", name:"Porção de Salame", desc:"", price:47.00, emoji:"🥩" },
+  { id:147, category:"porcoes", name:"Porção de Provolone", desc:"", price:42.00, emoji:"🧀" },
+  { id:148, category:"porcoes", name:"Porção de Mini Pastéis", desc:"16 pastéis", price:40.00, emoji:"🥟" },
+  { id:149, category:"porcoes", name:"Porção de Mini Coxinhas", desc:"20 coxinhas", price:40.00, emoji:"🥟" },
+  { id:150, category:"porcoes", name:"Porção de Mandioca Frita Cremosa", desc:"", price:35.00, emoji:"🥔" },
+  { id:151, category:"porcoes", name:"Porção Contra Filé", desc:"", price:79.90, emoji:"🥩" },
+  { id:152, category:"porcoes", badge:"Chef", name:"Porção de Picanha", desc:"", price:98.90, emoji:"🥩" },
+  { id:153, category:"pizzas", name:"Pizza Mussarela", desc:"", price:45.00, emoji:"🍕" },
+  { id:154, category:"pizzas", name:"Pizza Calabresa com Queijo", desc:"", price:60.00, emoji:"🍕" },
+  { id:155, category:"pizzas", name:"Pizza Frango com Catupiry", desc:"", price:70.00, emoji:"🍕" },
+  { id:156, category:"pizzas", name:"Pizza Marguerita", desc:"", price:70.00, emoji:"🍕" },
+  { id:157, category:"pizzas", name:"Pizza Toscana", desc:"", price:70.00, emoji:"🍕" },
+  { id:158, category:"pizzas", name:"Pizza Light", desc:"", price:75.00, emoji:"🍕" },
+  { id:159, category:"pizzas", name:"Pizza Portuguesa", desc:"", price:75.00, emoji:"🍕" },
+  { id:160, category:"pizzas", name:"Pizza de Brócolis", desc:"Brócolis, queijo e bacon", price:75.00, emoji:"🍕" },
+  { id:161, category:"pizzas", name:"Pizza Portuguesa com Peito de Peru", desc:"", price:75.00, emoji:"🍕" },
+  { id:162, category:"pizzas", name:"Pizza Atum com Queijo", desc:"", price:75.00, emoji:"🍕" },
+  { id:163, category:"pizzas", name:"Pizza 4 Queijos", desc:"", price:75.00, emoji:"🍕" },
+  { id:164, category:"acai", name:"Açaí Simples", desc:"", price:18.00, emoji:"🍧" },
+  { id:165, category:"acai", name:"Açaí com Banana", desc:"", price:15.00, emoji:"🍧" },
+  { id:166, category:"acai", name:"Açaí Banana", desc:"Banana, xarope de guaraná e granola", price:22.00, emoji:"🍧" },
+  { id:167, category:"acai", badge:"Popular", name:"Açaí Morango", desc:"Morango, xarope de guaraná e granola", price:23.00, emoji:"🍧" },
+  { id:168, category:"acai", badge:"Serve 2", name:"Açaí na Barca", desc:"", price:35.00, emoji:"🍧" },
+  { id:169, category:"acai", name:"Vitamina de Açaí com Banana", desc:"", price:16.00, emoji:"🥤" },
+  { id:170, category:"acai", name:"Vitamina de Abacate", desc:"", price:11.00, emoji:"🥑" },
+  { id:171, category:"acai", name:"Vitamina de Mamão", desc:"", price:10.50, emoji:"🥤" },
+  { id:172, category:"acai", name:"Vitamina de Banana com Aveia", desc:"", price:11.00, emoji:"🍌" },
+  { id:173, category:"acai", name:"Vitamina de Iogurte com Leite e Morango", desc:"", price:11.00, emoji:"🍓" },
+  { id:174, category:"acai", name:"Vitamina Mista", desc:"", price:12.00, emoji:"🥤" },
+  { id:175, category:"acai", name:"Vitamina de Banana", desc:"", price:10.00, emoji:"🍌" },
+  { id:176, category:"acai", name:"Vitamina Banana com Aveia", desc:"", price:15.50, emoji:"🍌" },
+  { id:177, category:"sucos", name:"Suco de Açaí", desc:"", price:14.50, emoji:"🧃" },
+  { id:178, category:"sucos", name:"Suco de Limão", desc:"", price:9.50, emoji:"🧃" },
+  { id:179, category:"sucos", name:"Suco de Laranja", desc:"", price:10.00, emoji:"🧃" },
+  { id:180, category:"sucos", name:"Suco de Maracujá", desc:"", price:11.00, emoji:"🧃" },
+  { id:181, category:"sucos", name:"Suco de Abacaxi", desc:"", price:10.00, emoji:"🧃" },
+  { id:182, category:"sucos", name:"Suco de Melancia", desc:"", price:11.00, emoji:"🧃" },
+  { id:183, category:"sucos", name:"Suco de Manga", desc:"", price:11.00, emoji:"🧃" },
+  { id:184, category:"sucos", name:"Suco de Morango", desc:"", price:11.00, emoji:"🧃" },
+  { id:185, category:"sucos", name:"Suco de Goiaba", desc:"", price:10.00, emoji:"🧃" },
+  { id:186, category:"sucos", name:"Suco de Maçã", desc:"", price:10.50, emoji:"🧃" },
+  { id:187, category:"sucos", name:"Suco de Caju", desc:"", price:10.00, emoji:"🧃" },
+  { id:188, category:"sucos", name:"Suco de Cajá", desc:"", price:9.50, emoji:"🧃" },
+  { id:189, category:"sucos", name:"Suco de Açaí com Leite", desc:"", price:15.50, emoji:"🥛" },
+  { id:190, category:"sucos", name:"Suco de Morango com Leite", desc:"", price:12.50, emoji:"🥛" },
+  { id:191, category:"sucos", name:"Suco de Goiaba com Leite", desc:"", price:10.50, emoji:"🥛" },
+  { id:192, category:"sucos", name:"Suco de Maracujá com Leite", desc:"", price:11.50, emoji:"🥛" },
+  { id:193, category:"sucos", name:"Suco de Manga com Leite", desc:"", price:11.50, emoji:"🥛" },
+  { id:194, category:"sucos", name:"Suco de Maçã com Leite", desc:"", price:11.50, emoji:"🥛" },
+  { id:195, category:"sucos", name:"Suco de Abacaxi com Leite", desc:"", price:10.50, emoji:"🥛" },
+  { id:196, category:"sucos", name:"Suco de Cajá com Leite", desc:"", price:11.50, emoji:"🥛" },
+  { id:197, category:"sucos", name:"Suco de Caju com Leite", desc:"", price:10.50, emoji:"🥛" },
+  { id:198, category:"sucos", name:"Suco de Limão com Leite", desc:"", price:10.50, emoji:"🥛" },
+  { id:199, category:"sucos", name:"Suco de Laranja com Leite", desc:"", price:10.50, emoji:"🥛" },
+  { id:200, category:"sucos", name:"Suco de Melancia com Leite", desc:"", price:11.50, emoji:"🥛" },
+  { id:201, category:"sucos", name:"Suco de Caju (1 Litro)", desc:"", price:16.50, emoji:"🧃" },
+  { id:202, category:"sucos", name:"Suco de Graviola (1 Litro)", desc:"", price:16.50, emoji:"🧃" },
+  { id:203, category:"sucos", name:"Suco de Limão (1 Litro)", desc:"", price:18.00, emoji:"🧃" },
+  { id:204, category:"sucos", name:"Suco de Laranja (1 Litro)", desc:"", price:18.00, emoji:"🧃" },
+  { id:205, category:"sucos", name:"Suco de Maçã (1 Litro)", desc:"", price:16.50, emoji:"🧃" },
+  { id:206, category:"sucos", name:"Suco de Maracujá (1 Litro)", desc:"", price:16.50, emoji:"🧃" },
+  { id:207, category:"sucos", name:"Suco de Morango (1 Litro)", desc:"", price:16.50, emoji:"🧃" },
+  { id:208, category:"sucos", name:"Suco de Melão (1 Litro)", desc:"", price:15.50, emoji:"🧃" },
+  { id:209, category:"sucos", name:"Suco de Melancia (1 Litro)", desc:"", price:18.00, emoji:"🧃" },
+  { id:210, category:"sucos", name:"Suco de Goiaba (1 Litro)", desc:"", price:16.50, emoji:"🧃" },
+  { id:211, category:"sucos", name:"Suco Detox 1", desc:"Laranja, couve, gengibre e maçã verde", price:15.00, emoji:"🥬" },
+  { id:212, category:"sucos", name:"Suco Detox 2", desc:"Abacaxi, laranja, couve e gengibre", price:15.00, emoji:"🥬" },
+  { id:213, category:"sucos", name:"Suco Detox 3", desc:"Água de coco, couve, gengibre e maçã", price:17.00, emoji:"🥬" },
+  { id:214, category:"sucos", name:"Suco Detox 4", desc:"Limão com gengibre", price:13.00, emoji:"🥬" },
+  { id:215, category:"sucos", name:"Suco Especial Abacaxi com Hortelã", desc:"", price:13.00, emoji:"🍍" },
+  { id:216, category:"sucos", name:"Suco Especial Laranja com Acerola", desc:"", price:13.00, emoji:"🍊" },
+  { id:217, category:"sucos", name:"Suco Especial Laranja com Mamão", desc:"", price:13.00, emoji:"🍊" },
+  { id:218, category:"sucos", name:"Suco Especial Laranja com Cenoura e Beterraba", desc:"", price:14.00, emoji:"🥕" },
+  { id:219, category:"sucos", badge:"Popular", name:"Limonada Suíça", desc:"Limão, leite condensado, água com gás e gelo", price:15.00, emoji:"🍋" },
+  { id:220, category:"sobremesas", name:"Bolo de Milho", desc:"Fatia", price:4.50, emoji:"🍰" },
+  { id:221, category:"sobremesas", name:"Bolo de Banana", desc:"Fatia", price:4.50, emoji:"🍰" },
+  { id:222, category:"sobremesas", name:"Bolo de Cenoura com Cobertura de Chocolate", desc:"Fatia", price:4.50, emoji:"🍰" },
+  { id:223, category:"sobremesas", name:"Bolo de Laranja", desc:"Fatia", price:4.50, emoji:"🍰" },
+  { id:224, category:"sobremesas", name:"Bolo de Chocolate com Cobertura", desc:"Fatia", price:4.50, emoji:"🍫" },
+  { id:225, category:"sobremesas", name:"Salada de Fruta com Mamão", desc:"", price:9.00, emoji:"🍓" },
+  { id:226, category:"sobremesas", name:"Salada de Fruta com Manga", desc:"", price:9.00, emoji:"🥭" },
+  { id:227, category:"sobremesas", name:"Salada de Frutas", desc:"", price:10.90, emoji:"🍓" },
+  { id:228, category:"sobremesas", name:"Milk Shake de Açaí", desc:"", price:18.00, emoji:"🥤" },
+  { id:229, category:"sobremesas", name:"Milk Shake Tradicional", desc:"", price:17.00, emoji:"🥤" },
+  { id:230, category:"sobremesas", badge:"Popular", name:"Petit Gateau", desc:"", price:17.00, emoji:"🍫" },
+  { id:231, category:"bebidas", name:"Coca-Cola (lata 350ml)", desc:"", price:8.90, emoji:"🥤" },
+  { id:232, category:"bebidas", name:"Coca-Cola Zero (lata 350ml)", desc:"", price:8.00, emoji:"🥤" },
+  { id:233, category:"bebidas", name:"Pepsi (lata)", desc:"", price:6.80, emoji:"🥤" },
+  { id:234, category:"bebidas", name:"Pepsi Twist (lata)", desc:"", price:6.80, emoji:"🥤" },
+  { id:235, category:"bebidas", name:"Itubaína (lata)", desc:"", price:8.00, emoji:"🥤" },
+  { id:236, category:"bebidas", name:"Fanta Uva (lata)", desc:"", price:6.80, emoji:"🥤" },
+  { id:237, category:"bebidas", name:"Guaraná (lata)", desc:"", price:8.00, emoji:"🥤" },
+  { id:238, category:"bebidas", name:"Soda (lata)", desc:"", price:6.80, emoji:"🥤" },
+  { id:239, category:"bebidas", name:"Schweppes (lata)", desc:"", price:8.50, emoji:"🥤" },
+  { id:240, category:"bebidas", name:"Itubaína Long Neck 355ml", desc:"", price:6.80, emoji:"🥤" },
+  { id:241, category:"bebidas", name:"Coca-Cola 1L", desc:"", price:12.00, emoji:"🥤" },
+  { id:242, category:"bebidas", name:"Refrigerante 1,5L", desc:"Coca-Cola, Fanta Laranja ou Guaraná", price:15.00, emoji:"🥤" },
+  { id:243, category:"bebidas", name:"Água sem Gás 370ml", desc:"", price:4.00, emoji:"💧" },
+  { id:244, category:"bebidas", name:"Água com Gás 370ml", desc:"", price:4.50, emoji:"💧" },
+  { id:245, category:"bebidas", name:"Água 1L", desc:"", price:5.00, emoji:"💧" },
+  { id:246, category:"bebidas", name:"Água 1,5L", desc:"", price:6.00, emoji:"💧" },
+  { id:247, category:"bebidas", name:"Água com Gás 1,5L", desc:"", price:7.50, emoji:"💧" },
+  { id:248, category:"bebidas", name:"Água de Coco 1L", desc:"", price:17.00, emoji:"🥥" },
+  { id:249, category:"bebidas", name:"Água Tônica 350ml", desc:"", price:7.50, emoji:"💧" },
+  { id:250, category:"bebidas", name:"Copo de Água", desc:"", price:2.50, emoji:"💧" },
+  { id:251, category:"bebidas", name:"Ades / Mupy / Del Valle 200ml", desc:"Uva, morango ou laranja", price:5.00, emoji:"🧃" },
+  { id:252, category:"bebidas", name:"Del Valle 1L", desc:"", price:14.00, emoji:"🧃" },
+  { id:253, category:"bebidas", name:"Chá Mate Leão Limão", desc:"", price:7.50, emoji:"🧉" },
+  { id:254, category:"bebidas", name:"Chá Mate Leão Natural", desc:"", price:7.50, emoji:"🧉" },
+  { id:255, category:"bebidas", name:"Chá Mate Leão Pêssego", desc:"", price:7.50, emoji:"🧉" },
+  { id:256, category:"bebidas", name:"H2OH! Limão", desc:"", price:7.50, emoji:"💧" },
+  { id:257, category:"bebidas", name:"H2OH! Limoneto", desc:"", price:7.50, emoji:"💧" },
+  { id:258, category:"bebidas", name:"Feel Good Chá Vermelho (Amora)", desc:"", price:8.00, emoji:"🍵" },
+  { id:259, category:"bebidas", name:"Feel Good Laranja com Gengibre", desc:"", price:8.00, emoji:"🍵" },
+  { id:260, category:"bebidas", name:"Feel Good Pitaya", desc:"", price:8.00, emoji:"🍵" },
+  { id:261, category:"bebidas", name:"Feel Good Verde", desc:"", price:8.00, emoji:"🍵" },
+  { id:262, category:"bebidas", name:"Gatorade Maracujá", desc:"", price:8.00, emoji:"🥤" },
+  { id:263, category:"bebidas", name:"Gatorade Morango", desc:"", price:8.00, emoji:"🥤" },
+  { id:264, category:"bebidas", name:"Gatorade Morango com Maracujá", desc:"", price:8.00, emoji:"🥤" },
+  { id:265, category:"bebidas", name:"Gatorade Tangerina", desc:"", price:8.00, emoji:"🥤" },
+  { id:266, category:"bebidas", name:"Gatorade Uva", desc:"", price:8.00, emoji:"🥤" },
+  { id:267, category:"bebidas", name:"Red Bull", desc:"", price:15.00, emoji:"🐂" },
+  { id:268, category:"bebidas", name:"Toddynho", desc:"", price:5.50, emoji:"🍫" },
+  { id:269, category:"bebidas", name:"Alpino 280ml", desc:"", price:10.00, emoji:"🍫" },
+  { id:270, category:"doces", name:"Bala Halls (diversos sabores)", desc:"", price:3.00, emoji:"🍫" },
+  { id:271, category:"doces", name:"Trident (diversos sabores)", desc:"", price:3.80, emoji:"🍫" },
+  { id:272, category:"doces", name:"Bala Garoto", desc:"", price:3.00, emoji:"🍫" },
+  { id:273, category:"doces", name:"Mentos Kiss", desc:"", price:16.70, emoji:"🍫" },
+  { id:274, category:"doces", name:"Kit Kat", desc:"", price:5.50, emoji:"🍫" },
+  { id:275, category:"doces", name:"Lacta ao Leite 20g", desc:"", price:4.00, emoji:"🍫" },
+  { id:276, category:"doces", name:"Diamante Negro 20g", desc:"", price:4.00, emoji:"🍫" },
+  { id:277, category:"doces", name:"Diamante Negro 90g", desc:"", price:8.99, emoji:"🍫" },
+  { id:278, category:"doces", name:"Laka 90g", desc:"", price:8.99, emoji:"🍫" },
+  { id:279, category:"doces", name:"Lacta 90g", desc:"", price:8.99, emoji:"🍫" },
+  { id:280, category:"doces", name:"Bala de Goma sem Açúcar", desc:"", price:3.50, emoji:"🍫" },
+  { id:281, category:"doces", name:"Paçoquita", desc:"", price:2.50, emoji:"🍫" },
+  { id:282, category:"doces", name:"Paçoquita Diet", desc:"", price:2.80, emoji:"🍫" },
+  { id:283, category:"doces", name:"Chokito", desc:"", price:4.50, emoji:"🍫" },
+  { id:284, category:"doces", name:"Lollo", desc:"", price:4.50, emoji:"🍫" },
+  { id:285, category:"doces", name:"Bananinha com Açúcar", desc:"", price:5.50, emoji:"🍫" },
+  { id:286, category:"doces", name:"Bananinha sem Açúcar", desc:"", price:6.00, emoji:"🍫" },
+  { id:287, category:"doces", name:"Nutella B-ready", desc:"", price:7.50, emoji:"🍫" },
+  { id:288, category:"doces", name:"Ferrero Rocher", desc:"", price:4.95, emoji:"🍫" },
+  { id:289, category:"doces", name:"Nestlé Moça", desc:"", price:5.00, emoji:"🍫" },
+  { id:290, category:"doces", name:"Snickers", desc:"", price:6.00, emoji:"🍫" },
+  { id:291, category:"doces", name:"Twix", desc:"", price:5.00, emoji:"🍫" },
+  { id:292, category:"doces", name:"Prestígio", desc:"", price:4.50, emoji:"🍫" },
+  { id:293, category:"doces", name:"Alpino Tablete", desc:"", price:4.50, emoji:"🍫" },
+  { id:294, category:"doces", name:"Crunch", desc:"", price:4.50, emoji:"🍫" },
+  { id:295, category:"doces", name:"Ouro Branco", desc:"", price:3.00, emoji:"🍫" },
+  { id:296, category:"doces", name:"Sonho de Valsa", desc:"", price:3.00, emoji:"🍫" },
+  { id:297, category:"doces", name:"Cocada Caseira Vó Nena", desc:"", price:6.00, emoji:"🍫" },
+  { id:298, category:"doces", name:"Shot 20g", desc:"", price:4.00, emoji:"🍫" },
+  { id:299, category:"doces", name:"5 Star", desc:"", price:5.50, emoji:"🍫" },
+  { id:300, category:"conveniencia", name:"Açúcar Guarani 1kg", desc:"", price:5.99, emoji:"🛒" },
+  { id:301, category:"conveniencia", name:"Amendoim Yoki", desc:"", price:12.99, emoji:"🛒" },
+  { id:302, category:"conveniencia", name:"Café Melitta 250g", desc:"", price:9.90, emoji:"🛒" },
+  { id:303, category:"conveniencia", name:"Cappuccino 3 Corações 200g", desc:"", price:22.99, emoji:"🛒" },
+  { id:304, category:"conveniencia", name:"Cappuccino 3 Corações 400g", desc:"", price:32.99, emoji:"🛒" },
+  { id:305, category:"conveniencia", name:"Creme de Leite Piracanjuba", desc:"", price:5.50, emoji:"🛒" },
+  { id:306, category:"conveniencia", name:"Goiabada 500g", desc:"", price:9.99, emoji:"🛒" },
+  { id:307, category:"conveniencia", name:"Leite Condensado Piracanjuba", desc:"", price:9.90, emoji:"🛒" },
+  { id:308, category:"conveniencia", name:"Leite Desnatado 1L", desc:"", price:7.50, emoji:"🛒" },
+  { id:309, category:"conveniencia", name:"Leite Integral 1L", desc:"", price:7.50, emoji:"🛒" },
+  { id:310, category:"conveniencia", name:"Nutella 140g", desc:"", price:17.99, emoji:"🛒" },
+  { id:311, category:"conveniencia", name:"Nutella 650g", desc:"", price:40.00, emoji:"🛒" },
+  { id:312, category:"conveniencia", name:"Queijo Minas Coronata 500g", desc:"", price:19.99, emoji:"🛒" },
+  { id:313, category:"conveniencia", name:"Requeijão Vigor 200g", desc:"", price:9.99, emoji:"🛒" },
+  { id:314, category:"eventos", name:"Garrafa de Chá", desc:"Diversos sabores", price:25.00, emoji:"🫖" },
+  { id:315, category:"eventos", name:"Garrafa de Café", desc:"", price:35.00, emoji:"☕" },
+  { id:316, category:"eventos", name:"Garrafa de Leite Quente", desc:"", price:25.00, emoji:"🥛" },
+  { id:317, category:"eventos", name:"Garrafa de Chocolate Quente", desc:"", price:35.00, emoji:"🍫" },
+  { id:318, category:"eventos", name:"Bolo Inteiro", desc:"", price:40.00, emoji:"🎂" },
+  { id:319, category:"eventos", name:"Torta Tradicional", desc:"Inteira — ideal para festas", price:134.00, emoji:"🎂" },
+  { id:320, category:"eventos", badge:"Serve festa", name:"Pão de Metro Misto", desc:"Mussarela, presunto, alface e tomate", price:135.00, emoji:"🥖" },
+  { id:321, category:"eventos", name:"Mini Pão de Queijo", desc:"Unidade", price:1.66, emoji:"🧀" },
+  { id:322, category:"eventos", name:"Mini Salgados", desc:"Unidade", price:1.66, emoji:"🥟" },
+  { id:323, category:"eventos", name:"Suco 1L", desc:"Laranja, abacaxi, morango, melancia ou maracujá", price:18.00, emoji:"🧃" },
+  { id:324, category:"eventos", name:"Refrigerante 1,5L", desc:"", price:14.00, emoji:"🥤" },
+  { id:325, category:"eventos", name:"50 un. Bolinha de Queijo", desc:"", price:50.00, emoji:"🧀" },
+  { id:326, category:"eventos", name:"50 un. Mini Coxinha", desc:"", price:50.00, emoji:"🥟" },
+  { id:327, category:"eventos", name:"50 un. Mini Kibe", desc:"", price:50.00, emoji:"🥟" },
+  { id:328, category:"eventos", name:"50 un. Mini Risole de Queijo", desc:"", price:50.00, emoji:"🧀" },
+  { id:329, category:"eventos", name:"50 un. Mini Risole de Carne", desc:"", price:50.00, emoji:"🥟" },
 ];
+const CATEGORIES = [
+  { key: "cafe", label: "Café da Manhã", emoji: "☕" },
+  { key: "paes", label: "Pães & Pão de Queijo", emoji: "🥖" },
+  { key: "salgados", label: "Salgados", emoji: "🥟" },
+  { key: "tapiocas", label: "Tapiocas", emoji: "🫓" },
+  { key: "lanches", label: "Lanches", emoji: "🥪" },
+  { key: "burgers", label: "Burgers & Beirutes", emoji: "🍔" },
+  { key: "omeletes", label: "Omeletes", emoji: "🍳" },
+  { key: "pratos", label: "Pratos Executivos", emoji: "🍽️" },
+  { key: "guarnicoes", label: "Guarnições", emoji: "🍚" },
+  { key: "saladas", label: "Saladas", emoji: "🥗" },
+  { key: "porcoes", label: "Porções", emoji: "🍟" },
+  { key: "pizzas", label: "Pizzas", emoji: "🍕" },
+  { key: "acai", label: "Açaí & Vitaminas", emoji: "🍧" },
+  { key: "sucos", label: "Sucos", emoji: "🧃" },
+  { key: "sobremesas", label: "Bolos & Sobremesas", emoji: "🍰" },
+  { key: "bebidas", label: "Bebidas", emoji: "🥤" },
+  { key: "doces", label: "Doces & Chocolates", emoji: "🍫" },
+  { key: "conveniencia", label: "Conveniência", emoji: "🛒" },
+  { key: "eventos", label: "Festas & Coffee Break", emoji: "🎉" },
+];
+const CAT_META = Object.fromEntries(CATEGORIES.map(c=>[c.key,c]));
+const COUNT = {}; menu.forEach(i=>COUNT[i.category]=(COUNT[i.category]||0)+1);
 
-// ============================================================
-// STATE
-// ============================================================
-let cart = {};
-let currentCategory = 'all';
-let orderCounter = Math.floor(Math.random() * 90) + 10; // demo
+// ===== STATE =====
+let cart={};                 // id -> qty
+let view='home';             // 'home' | 'category' | 'search'
+let activeCat=null;
+let search='';
+let orderCounter=Math.floor(Math.random()*90)+10;
+let currentOrder=null;       // {id, order_number}
+let pollTimer=null;
 
-// ============================================================
-// RENDER MENU
-// ============================================================
-function renderMenu() {
-  const container = document.getElementById('menuContainer');
-  const categories = {
-    entradas:    { label: 'Entradas', emoji: '🥗' },
-    massas:      { label: 'Massas & Risotos', emoji: '🍝' },
-    carnes:      { label: 'Carnes', emoji: '🥩' },
-    bebidas:     { label: 'Bebidas', emoji: '🍷' },
-    sobremesas:  { label: 'Sobremesas', emoji: '🍮' },
-  };
+const $=s=>document.querySelector(s);
+const app=$('#app');
+const norm=s=>(s||'').normalize('NFD').replace(/\p{Diacritic}/gu,'').toLowerCase();
+const brl=n=>n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 
-  container.innerHTML = '';
-
-  Object.entries(categories).forEach(([key, meta]) => {
-    const items = menu.filter(i => i.category === key &&
-      (currentCategory === 'all' || currentCategory === key));
-    if (!items.length) return;
-
-    const section = document.createElement('section');
-    section.id = `sec-${key}`;
-    section.innerHTML = `
-      <h2 class="section-title">
-        <span class="emoji">${meta.emoji}</span> ${meta.label}
-      </h2>
-      <div class="items-grid">
-        ${items.map(item => renderItem(item)).join('')}
-      </div>
-    `;
-    container.appendChild(section);
-  });
+// ===== RENDER: dispatch =====
+function render(){
+  if(search) return renderSearch();
+  if(view==='category') return renderCategory();
+  return renderHome();
 }
 
-function renderItem(item) {
-  const inCart = cart[item.id];
-  const price = item.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+function renderHome(){
+  view='home';
+  const feats=menu.filter(i=>i.badge).slice(0,14);
+  let html='';
+  if(feats.length){
+    html+='<div class="block-title">Destaques da casa<span class="line"></span></div>';
+    html+='<div class="featured-scroll">'+feats.map(featCard).join('')+'</div>';
+  }
+  html+='<div class="block-title">Categorias<span class="line"></span></div>';
+  html+='<div class="cat-grid">'+CATEGORIES.map(c=>`
+    <button class="cat-card" onclick="openCategory('${c.key}')">
+      <div class="cat-ic">${c.emoji}</div>
+      <div class="cat-label">${c.label}</div>
+      <div class="cat-count">${COUNT[c.key]||0} ${(COUNT[c.key]===1)?'item':'itens'}</div>
+    </button>`).join('')+'</div>';
+  app.innerHTML=html;
+  window.scrollTo({top:0});
+}
 
-  return `
-    <div class="item-card" id="card-${item.id}">
-      ${item.badge ? `<div class="badge">${item.badge}</div>` : ''}
-      <div class="item-img">
-        ${item.imageUrl
-          ? `<img src="${item.imageUrl}" alt="${item.name}" onerror="this.parentElement.innerHTML='<span class=\\'emoji-fallback\\'>${item.emoji}</span>'">`
-          : `<span class="emoji-fallback">${item.emoji}</span>`
-        }
+function renderCategory(){
+  view='category';
+  const items=menu.filter(i=>i.category===activeCat);
+  const meta=CAT_META[activeCat];
+  let html='<div class="subbar">';
+  html+='<div class="backrow"><button class="back-btn" onclick="goHome()">←</button>'
+      +`<h2>${meta.emoji} ${meta.label}</h2></div>`;
+  html+='<div class="chips">'+CATEGORIES.map(c=>
+    `<button class="chip ${c.key===activeCat?'active':''}" onclick="openCategory('${c.key}')">${c.emoji} ${c.label}</button>`).join('')+'</div>';
+  html+='</div>';
+  html+='<div class="items">'+items.map(i=>itemCard(i)).join('')+'</div>';
+  app.innerHTML=html;
+  const ac=app.querySelector('.chip.active'); if(ac) ac.scrollIntoView({inline:'center',block:'nearest'});
+  window.scrollTo({top:0});
+}
+
+function renderSearch(){
+  const q=norm(search);
+  const res=menu.filter(i=>norm(i.name).includes(q)||norm(i.desc).includes(q)||norm(CAT_META[i.category].label).includes(q));
+  let html='<div class="block-title">Resultados<span class="line"></span></div>';
+  html+=`<div class="search-meta">${res.length} ${res.length===1?'item encontrado':'itens encontrados'} para “${escapeHtml(search)}”</div>`;
+  if(!res.length){
+    html+='<div class="empty-state"><div class="big">🔍</div><h3>Nada encontrado</h3><p>Tente outro termo, como “frango”, “doce” ou “natural”.</p></div>';
+  }else{
+    html+='<div class="items">'+res.map(i=>itemCard(i,true)).join('')+'</div>';
+  }
+  app.innerHTML=html;
+}
+
+// ===== CARD TEMPLATES =====
+function hl(text){ // highlight search term
+  if(!search) return escapeHtml(text);
+  const q=norm(search); const n=norm(text);
+  const idx=n.indexOf(q); if(idx<0) return escapeHtml(text);
+  return escapeHtml(text.slice(0,idx))+'<mark>'+escapeHtml(text.slice(idx,idx+q.length))+'</mark>'+escapeHtml(text.slice(idx+q.length));
+}
+function featCard(i){
+  return `<div class="feat-card">
+    ${i.badge?`<div class="badge">${i.badge}</div>`:''}
+    <div class="feat-emoji">${i.emoji}</div>
+    <div class="feat-name">${escapeHtml(i.name)}</div>
+    <div class="feat-bottom"><span class="feat-price">${brl(i.price)}</span>
+      <button class="add-btn" onclick="add(${i.id})">+</button></div>
+  </div>`;
+}
+function itemCard(i,showCat){
+  const q=cart[i.id];
+  return `<div class="item ${q?'in-cart':''}" id="it-${i.id}">
+    ${i.badge?`<div class="badge">${i.badge}</div>`:''}
+    <div class="item-img">${i.emoji}</div>
+    <div class="item-body">
+      <div>
+        <div class="item-name">${search?hl(i.name):escapeHtml(i.name)}</div>
+        ${i.desc?`<div class="item-desc">${escapeHtml(i.desc)}</div>`:''}
+        ${showCat?`<div class="item-cat-tag">${CAT_META[i.category].emoji} ${CAT_META[i.category].label}</div>`:''}
       </div>
-      <div class="item-info">
-        <div>
-          <div class="item-name">${item.name}</div>
-          <div class="item-desc">${item.desc}</div>
-        </div>
-        <div class="item-footer">
-          <span class="item-price">${price}</span>
-          ${inCart ? `
-            <div class="qty-control">
-              <button class="qty-btn" onclick="changeQty(${item.id}, -1)">−</button>
-              <span class="qty-num">${inCart}</span>
-              <button class="qty-btn" onclick="changeQty(${item.id}, 1)">+</button>
-            </div>
-          ` : `
-            <button class="add-btn" onclick="addToCart(${item.id})">
-              + Adicionar
-            </button>
-          `}
-        </div>
+      <div class="item-foot">
+        <span class="item-price">${brl(i.price)}</span>
+        ${q?`<div class="qty"><button onclick="chg(${i.id},-1)">−</button><span>${q}</span><button onclick="chg(${i.id},1)">+</button></div>`
+            :`<button class="add-btn" onclick="add(${i.id})">+ Adicionar</button>`}
       </div>
     </div>
-  `;
+  </div>`;
 }
 
-// ============================================================
-// CART LOGIC
-// ============================================================
-function addToCart(id) {
-  cart[id] = (cart[id] || 0) + 1;
-  updateCartUI();
-  showToast(`${menu.find(i=>i.id===id).name} adicionado!`);
+// ===== NAV =====
+function openCategory(k){ activeCat=k; search=''; syncSearchInput(); renderCategory(); }
+function goHome(){ activeCat=null; renderHome(); }
+
+// ===== SEARCH =====
+let searchDebounce=null;
+$('#searchInput').addEventListener('input',e=>{
+  search=e.target.value.trim();
+  $('#searchClear').classList.toggle('show',!!search);
+  clearTimeout(searchDebounce);
+  searchDebounce=setTimeout(()=>{ search?renderSearch():render(); },140);
+});
+function clearSearch(){ search=''; $('#searchInput').value=''; $('#searchClear').classList.remove('show'); render(); $('#searchInput').blur(); }
+function syncSearchInput(){ $('#searchInput').value=''; $('#searchClear').classList.remove('show'); }
+
+// ===== CART =====
+function add(id){ cart[id]=(cart[id]||0)+1; afterCart(); toast(menu.find(i=>i.id===id).name+' adicionado'); }
+function chg(id,d){ cart[id]=(cart[id]||0)+d; if(cart[id]<=0) delete cart[id]; afterCart(); }
+function afterCart(){ updateFab(); render(); if($('#overlay').classList.contains('open')) renderCartLines(); }
+function cartCount(){ return Object.values(cart).reduce((a,b)=>a+b,0); }
+function cartTotal(){ return Object.entries(cart).reduce((s,[id,q])=>s+menu.find(i=>i.id==id).price*q,0); }
+function updateFab(){
+  const c=cartCount(); const fab=$('#fab');
+  fab.classList.toggle('hidden',c===0);
+  $('#fabCount').textContent=c; $('#fabTotal').textContent=brl(cartTotal());
 }
 
-function changeQty(id, delta) {
-  cart[id] = (cart[id] || 0) + delta;
-  if (cart[id] <= 0) delete cart[id];
-  updateCartUI();
-}
-
-function updateCartUI() {
-  const total = Object.values(cart).reduce((a, b) => a + b, 0);
-  const fab = document.getElementById('cartFab');
-  const count = document.getElementById('cartCount');
-
-  count.textContent = total;
-  fab.classList.toggle('hidden', total === 0);
-
-  // Re-render affected cards only
-  menu.forEach(item => {
-    const card = document.getElementById(`card-${item.id}`);
-    if (card) {
-      const footer = card.querySelector('.item-footer');
-      const price = item.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-      const inCart = cart[item.id];
-      footer.innerHTML = `
-        <span class="item-price">${price}</span>
-        ${inCart ? `
-          <div class="qty-control">
-            <button class="qty-btn" onclick="changeQty(${item.id}, -1)">−</button>
-            <span class="qty-num">${inCart}</span>
-            <button class="qty-btn" onclick="changeQty(${item.id}, 1)">+</button>
-          </div>
-        ` : `
-          <button class="add-btn" onclick="addToCart(${item.id})">+ Adicionar</button>
-        `}
-      `;
-    }
-  });
-}
-
-function filterCategory(cat) {
-  currentCategory = cat;
-  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
-  renderMenu();
-  if (cat !== 'all') {
-    const sec = document.getElementById(`sec-${cat}`);
-    if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-}
-
-// ============================================================
-// CART MODAL
-// ============================================================
-function openCart() {
-  document.getElementById('overlay').classList.add('open');
-  renderCartItems();
-}
-
-function closeCart() {
-  document.getElementById('overlay').classList.remove('open');
-}
-
-function closeOnOverlay(e) {
-  if (e.target === document.getElementById('overlay')) closeCart();
-}
-
-function renderCartItems() {
-  const container = document.getElementById('cartItems');
-  const items = Object.entries(cart);
-
-  if (!items.length) {
-    container.innerHTML = `<div class="empty-cart"><div class="icon">🛒</div><p>Carrinho vazio</p></div>`;
-    document.getElementById('cartTotal').textContent = 'R$ 0,00';
-    return;
-  }
-
-  let total = 0;
-  container.innerHTML = items.map(([id, qty]) => {
-    const item = menu.find(i => i.id == id);
-    const sub = item.price * qty;
-    total += sub;
-    return `
-      <div class="cart-item">
-        <span style="font-size:1.2rem">${item.emoji}</span>
-        <span class="cart-item-name">${item.name}</span>
-        <span class="cart-item-qty">×${qty}</span>
-        <span class="cart-item-price">${sub.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</span>
-        <button class="cart-remove" onclick="removeFromCart(${id})">✕</button>
-      </div>
-    `;
+function openCart(){ if(!cartCount())return; $('#cartView').style.display='block'; $('#trackView').style.display='none'; renderCartLines(); $('#overlay').classList.add('open'); }
+function closeCart(){ $('#overlay').classList.remove('open'); }
+function overlayClick(e){ if(e.target===$('#overlay')) closeCart(); }
+function renderCartLines(){
+  const lines=Object.entries(cart);
+  $('#cartTotal').textContent=brl(cartTotal());
+  if(!lines.length){ $('#cartLines').innerHTML='<div class="empty-state"><div class="big">🛒</div><p>Seu carrinho está vazio</p></div>'; return; }
+  $('#cartLines').innerHTML=lines.map(([id,q])=>{
+    const i=menu.find(m=>m.id==id);
+    return `<div class="cart-line"><span class="ce">${i.emoji}</span>
+      <span class="cn">${escapeHtml(i.name)}<small>${brl(i.price)} cada</small></span>
+      <span class="mini-qty"><button onclick="chg(${i.id},-1)">−</button><span>${q}</span><button onclick="chg(${i.id},1)">+</button></span>
+      <span class="cp">${brl(i.price*q)}</span></div>`;
   }).join('');
-
-  document.getElementById('cartTotal').textContent =
-    total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
-function removeFromCart(id) {
-  delete cart[id];
-  updateCartUI();
-  renderCartItems();
-}
-
-// ============================================================
-// SUBMIT ORDER
-// ============================================================
-async function submitOrder() {
-  const name = document.getElementById('clientName').value.trim();
-  const table = document.getElementById('tableNum').value.trim();
-  const obs = document.getElementById('observations').value.trim();
-
-  if (!name) {
-    showToast('⚠️ Digite seu nome antes de enviar!');
-    closeCart();
-    document.getElementById('clientName').focus();
-    return;
-  }
-
-  if (!Object.keys(cart).length) return;
-
-  const btn = document.getElementById('confirmBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="loading-spinner"></span> Enviando...';
-
-  const items = Object.entries(cart).map(([id, qty]) => {
-    const item = menu.find(i => i.id == id);
-    return { id: parseInt(id), name: item.name, qty, price: item.price };
+// ===== SUBMIT ORDER =====
+async function sbInsertReturn(row){
+  const res=await fetch(SUPABASE_URL.replace(/\/$/,'')+'/rest/v1/orders',{
+    method:'POST',
+    headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+SUPABASE_ANON_KEY,'Content-Type':'application/json','Prefer':'return=representation'},
+    body:JSON.stringify(row)
   });
-
-  const total = items.reduce((sum, i) => sum + i.price * i.qty, 0);
-  orderCounter++;
-
-  const order = {
-    order_number: orderCounter,
-    client_name: name,
-    table_number: table ? parseInt(table) : null,
-    items,
-    observations: obs,
-    total,
-    status: 'pending',
-    created_at: new Date().toISOString()
-  };
-
-  try {
-    if (useSupabase) {
-      await sbInsert(order);
-    } else {
-      // DEMO MODE
-      await new Promise(r => setTimeout(r, 1200));
-      console.log('📦 PEDIDO (modo demo):', order);
+  const json=await res.json().catch(()=>null);
+  if(!res.ok) throw new Error((json&&(json.message||json.hint))||'HTTP '+res.status);
+  return Array.isArray(json)?json[0]:json;
+}
+async function submitOrder(){
+  const name=$('#clientName').value.trim();
+  const table=$('#tableNum').value.trim();
+  const obs=$('#obs').value.trim();
+  if(!name){ toast('⚠️ Digite seu nome'); $('#clientName').focus(); return; }
+  if(!cartCount()) return;
+  const btn=$('#confirmBtn'); btn.disabled=true; btn.innerHTML='<span class="spin"></span> Enviando…';
+  const items=Object.entries(cart).map(([id,q])=>{const i=menu.find(m=>m.id==id);return{id:i.id,name:i.name,qty:q,price:i.price};});
+  const total=cartTotal(); orderCounter++;
+  const order={order_number:orderCounter,client_name:name,table_number:table?parseInt(table):null,items,observations:obs,total,status:'pending',created_at:new Date().toISOString()};
+  try{
+    if(useSupabase){
+      const saved=await sbInsertReturn(order);
+      currentOrder={id:saved.id,order_number:saved.order_number||orderCounter};
+    }else{
+      await new Promise(r=>setTimeout(r,900));
+      currentOrder={id:null,order_number:orderCounter};
     }
-
-    // Sucesso
-    document.getElementById('orderNum').textContent = `#${String(orderCounter).padStart(3,'0')}`;
-    registerPushClient(String(orderCounter));
-    document.getElementById('cartContent').style.display = 'none';
-    document.getElementById('successScreen').classList.add('show');
-
-  } catch (err) {
-    console.error(err);
-    showToast('❌ Erro ao enviar. Tente novamente.');
-    btn.disabled = false;
-    btn.innerHTML = 'Enviar Pedido para a Cozinha →';
+    openTracking();
+  }catch(err){
+    console.error(err); toast('❌ Erro ao enviar. Tente de novo.');
+    btn.disabled=false; btn.innerHTML='Enviar pedido para a cozinha →';
   }
 }
 
-function resetOrder() {
-  cart = {};
-  document.getElementById('observations').value = '';
-  document.getElementById('cartContent').style.display = 'block';
-  document.getElementById('successScreen').classList.remove('show');
-  document.getElementById('confirmBtn').disabled = false;
-  document.getElementById('confirmBtn').innerHTML = 'Enviar Pedido para a Cozinha →';
-  updateCartUI();
-  renderMenu();
+// ===== TRACKING =====
+const STEP_BY_STATUS={pending:1,preparing:2,done:3,ready:3};
+function openTracking(){
+  $('#cartView').style.display='none'; $('#trackView').style.display='block'; $('#overlay').classList.add('open');
+  $('#trackNum').textContent='#'+String(currentOrder.order_number).padStart(3,'0');
+  setStep('pending');
+  cart={}; updateFab();
+  // gentle auto-request push (client asked for phone updates); still has manual button
+  registerPushClient();
+  startPolling();
 }
-
-// ============================================================
-// TOAST
-// ============================================================
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
-}
-
-
-// ============================================================
-// PUSH NOTIFICATIONS — Cliente
-// ============================================================
-const VAPID_PUBLIC_KEY = 'BDzD3jLwiAtEYJcfEx2vtlkrYTOYH1AT1J7scM-SomEBwlWvACgZ78eHE78sE0GCG48OibE702UIGlSfUxA_Gtk';
-const EDGE_FUNCTION_URL = 'https://iejbicssmxjgrxitpcpf.supabase.co/functions/v1/send-push';
-const ANON_KEY_PUSH = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllamJpY3NzbXhqZ3J4aXRwY3BmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3ODMyOTUsImV4cCI6MjA5MzM1OTI5NX0.NBXgFNEKzqpqMv1CtNzyRyw4bntflyH1sVw9-Ie6S_w';
-
-let pushOrderId = null;
-
-function urlB64ToUint8Array(base64String) {
-  const padding = '='.repeat((4 - base64String.length % 4) % 4);
-  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-  const rawData = atob(base64);
-  return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
-}
-
-async function registerPushClient(orderId) {
-  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
-  pushOrderId = orderId;
-
-  try {
-    const reg = await navigator.serviceWorker.register('/sw.js');
-    await navigator.serviceWorker.ready;
-
-    const permission = await Notification.requestPermission();
-    if (permission !== 'granted') return;
-
-    const sub = await reg.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlB64ToUint8Array(VAPID_PUBLIC_KEY)
-    });
-
-    // Save subscription to DB linking to this order
-    await fetch(SUPABASE_URL.replace(/\/$/, '') + '/rest/v1/push_subscriptions', {
-      method: 'POST',
-      headers: {
-        'apikey': SUPABASE_ANON_KEY,
-        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=minimal'
-      },
-      body: JSON.stringify({
-        order_id: orderId,
-        role: 'client',
-        subscription: sub.toJSON(),
-        created_at: new Date().toISOString()
-      })
-    });
-
-    console.log('Push subscription saved for order', orderId);
-  } catch(e) {
-    console.warn('Push registration failed:', e.message);
+function setStep(status){
+  const s=STEP_BY_STATUS[status]||1;
+  for(let n=1;n<=3;n++){
+    const el=$('#step-'+n); el.classList.remove('done','current');
+    if(n<s) el.classList.add('done');
+    else if(n===s) el.classList.add(status==='done'?'done':'current');
   }
+  $('#trackProg').style.width=(s===1?0:s===2?38:76)+'%';
+  const msg={
+    pending:'A cozinha <b>recebeu seu pedido</b> e vai começar já já. 🍳',
+    preparing:'Seu pedido está <b>sendo preparado</b> pela cozinha. 👨‍🍳',
+    done:'🎉 Seu pedido está <b>PRONTO</b>! Bom apetite!',
+  };
+  $('#trackMsg').innerHTML=msg[status==='ready'?'done':status]||msg.pending;
+  if(status==='done'||status==='ready'){ $('#trackLive').style.display='none'; try{navigator.vibrate&&navigator.vibrate([120,60,120]);}catch(e){} }
+}
+function startPolling(){
+  stopPolling();
+  if(!useSupabase||!currentOrder.id) return; // demo/no-id: static tracker
+  let last='pending';
+  pollTimer=setInterval(async()=>{
+    try{
+      const res=await fetch(SUPABASE_URL.replace(/\/$/,'')+'/rest/v1/orders?select=status,order_number&id=eq.'+currentOrder.id,
+        {headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+SUPABASE_ANON_KEY}});
+      if(!res.ok) return;
+      const rows=await res.json(); if(!rows||!rows.length) return;
+      const st=rows[0].status;
+      if(st&&st!==last){ last=st; setStep(st);
+        if(st==='preparing') toast('👨‍🍳 Seu pedido entrou em preparo!');
+        if(st==='done'||st==='ready') toast('🎉 Pedido pronto!');
+      }
+      if(st==='done'||st==='ready') stopPolling();
+    }catch(e){}
+  },4000);
+}
+function stopPolling(){ if(pollTimer){clearInterval(pollTimer);pollTimer=null;} }
+function newOrder(){ stopPolling(); currentOrder=null; closeCart(); $('#clientName').value='';$('#tableNum').value='';$('#obs').value=''; $('#confirmBtn').disabled=false; $('#confirmBtn').innerHTML='Enviar pedido para a cozinha →'; goHome(); }
+
+// ===== TOAST =====
+let toastT=null;
+function toast(msg){ const t=$('#toast'); t.innerHTML=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2400); }
+function escapeHtml(s){ return (s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+// ===== PUSH (client) =====
+function urlB64ToUint8Array(b){const p='='.repeat((4-b.length%4)%4);const s=(b+p).replace(/-/g,'+').replace(/_/g,'/');const r=atob(s);return Uint8Array.from([...r].map(c=>c.charCodeAt(0)));}
+async function enablePush(){ const ok=await registerPushClient(true); const btn=$('#notifyBtn'); if(ok){btn.classList.add('on');btn.textContent='🔔 Você será avisado no celular';} }
+async function registerPushClient(interactive){
+  if(!useSupabase||!currentOrder||!currentOrder.id) return false;
+  if(!('serviceWorker'in navigator)||!('PushManager'in window)) return false;
+  try{
+    const reg=await navigator.serviceWorker.register('/sw.js'); await navigator.serviceWorker.ready;
+    if(Notification.permission==='denied') return false;
+    if(Notification.permission!=='granted'){ if(!interactive&&Notification.permission==='default') return false; const p=await Notification.requestPermission(); if(p!=='granted') return false; }
+    const sub=await reg.pushManager.getSubscription()||await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlB64ToUint8Array(VAPID_PUBLIC_KEY)});
+    await fetch(SUPABASE_URL.replace(/\/$/,'')+'/rest/v1/push_subscriptions',{
+      method:'POST',headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+SUPABASE_ANON_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({order_id:currentOrder.id,role:'client',subscription:sub.toJSON(),created_at:new Date().toISOString()})
+    });
+    const btn=$('#notifyBtn'); if(btn){btn.classList.add('on');btn.textContent='🔔 Você será avisado no celular';}
+    return true;
+  }catch(e){ console.warn('push',e.message); return false; }
 }
 
-// ============================================================
-// INIT
-// ============================================================
-renderMenu();
+// ===== INIT =====
+render();
+updateFab();
 </script>
 </body>
 </html>
